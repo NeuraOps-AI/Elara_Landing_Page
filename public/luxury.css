@@ -1,0 +1,362 @@
+/* ELARA — an editorial language of light, space and quiet detail. */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/cormorant-garamond-latin-ext.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  unicode-range: U+0100-02FF, U+1D00-1EFF, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/cormorant-garamond-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/fonts/cormorant-garamond-italic-latin.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 300 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/manrope-latin-ext.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0100-02FF, U+1D00-1EFF, U+20A0-20AB, U+20AD-20C4;
+}
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/manrope-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'Manrope', 'Segoe UI', sans-serif;
+  --ink: #243e32;
+  --muted: #716e62;
+  --clay: #a67c3e;
+  --line: #dacfbc;
+}
+body { font-family: var(--sans); font-size: 14px; font-weight: 400; }
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; }
+h1, h2 { letter-spacing: -.035em; }
+h1 em, h2 em { font-family: var(--serif); font-weight: 400; color: #a67c3e; }
+p { line-height: 1.8; }
+button, input, select, textarea { font-family: var(--sans); }
+.wrap { max-width: 1536px; width: calc(100% - 144px); }
+.eyebrow, .section-label { font-family: var(--sans); font-size: 10px; font-weight: 500; letter-spacing: .16em; }
+.fine-print { font-size: 11px !important; line-height: 1.8 !important; color: #767367; }
+.section-space { margin-top: 120px; }
+.text-link { font-size: 12px; font-weight: 500; padding-block: 13px; border-color: #b4a78e; }
+.button { min-height: 52px; font-size: 12px; font-weight: 500; letter-spacing: .025em; border-radius: 2px; padding-inline: 23px; }
+.round-button { width: 46px; height: 46px; }
+
+/* The wordmark remains distinct from the editorial display typography. */
+.sunrise-header { height: 132px; gap: 38px; }
+.sunrise-brand { width: 154px; }
+.brand-name { font-family: var(--serif); font-size: 47px; font-weight: 500; letter-spacing: .105em; }
+.brand-sun { height: 38px; width: 87px; stroke-width: 1.15; }
+.brand-byline { font-family: var(--sans); font-size: 7px; letter-spacing: .29em; margin-top: 6px; }
+.sunrise-navigation { gap: 32px; border-left: none; padding-left: 0; }
+.sunrise-navigation a { font-size: 12px; font-weight: 400; letter-spacing: .025em; padding-block: 16px; color: #555b50; }
+.sunrise-navigation a.current { font-weight: 500; }
+.sunrise-navigation a::after { bottom: 7px; height: 1px; }
+.developer-brand img { width: 67px; height: 64px; }
+
+/* A measured left margin and a lighter, larger two-line opening. */
+.sunrise-hero { min-height: max(800px, calc(100svh - 132px)); height: auto; max-height: none; }
+.sunrise-content { padding-top: 52px; padding-bottom: 120px; }
+.sunrise-copy { width: 610px; max-width: 47%; }
+.sunrise-eyebrow { font-size: 10px; letter-spacing: .16em; font-weight: 500; line-height: 1.6; gap: 14px; margin-bottom: 28px; color: #72684f; }
+.sunrise-eyebrow > span { width: 27px; background: #b49a6b; }
+.sunrise-content h1 { font-family: var(--serif); font-size: clamp(68px, 6.4vw, 108px); font-weight: 400; line-height: .97; letter-spacing: -.045em; max-width: 640px; }
+.sunrise-content h1 em { display: inline-block; font-size: 1em; font-weight: 400; line-height: 1.04; white-space: nowrap; padding-right: .08em; margin-top: .04em; color: #a07839; }
+.sunrise-content .sunrise-rule { width: 42px; height: 1px; background: #aa8c58; margin: 28px 0 24px; }
+.sunrise-description { font-size: 15px; font-weight: 400; letter-spacing: .005em; line-height: 1.85; color: #646657; }
+.sunrise-offer { width: 365px; max-width: 100%; margin-top: 30px; padding: 23px 0 22px; border: 0; border-top: 1px solid #baa0746e; border-bottom: 1px solid #baa0746e; border-radius: 0; box-shadow: none; background: transparent; }
+.offer-eyebrow { font-family: var(--sans); font-size: 9px; letter-spacing: .16em; line-height: 1.5; font-weight: 500; color: #8b7049; margin-bottom: 10px; }
+.offer-price { font-family: var(--serif); font-size: 64px; font-weight: 400; line-height: .95; letter-spacing: -.035em; color: #294936; }
+.offer-price small { font-size: .47em; font-weight: 400; letter-spacing: -.02em; margin-left: .05em; }
+.offer-regular { font-size: 13px; margin-top: 11px; color: #777366; line-height: 1.6; }
+.offer-regular del { margin-left: 8px; text-decoration-color: #a99170; }
+.offer-qualifier { margin-top: 17px; padding-top: 0; border: 0; gap: 10px; }
+.offer-qualifier > svg { width: 22px; height: 22px; color: #a58b5f; stroke-width: 1.25; }
+.offer-qualifier p { font-size: 13px; line-height: 1.65; color: #777267; }
+.offer-qualifier strong { font-weight: 600; color: #52604c; }
+.sunrise-actions { margin-top: 26px; gap: 20px; flex-wrap: wrap; max-width: 100%; }
+.sunrise-primary, .sunrise-secondary { font-family: var(--sans); font-size: 11px; letter-spacing: .025em; font-weight: 500; min-height: 52px; border-radius: 2px; padding: 15px 20px; gap: 18px; line-height: 1.4; }
+.sunrise-primary { background: #254d37; border-color: #254d37; box-shadow: none; }
+.sunrise-secondary { padding: 13px 0; min-height: 48px; border: 0; border-bottom: 1px solid #9aab98; background: transparent; }
+.sunrise-secondary:hover { background: transparent; }
+.sunrise-primary svg, .sunrise-secondary svg { width: 16px; height: 16px; }
+.sunrise-bottom { bottom: 30px; }
+.sunrise-scroll { font-size: 9px; letter-spacing: .14em; color: #74775e; }
+.sunrise-scroll > span { width: 34px; height: 34px; border-color: #bac0ac; }
+.scene-controls { font-size: 10px; gap: 17px; }
+.scene-controls button { font-size: 10px; }
+.sunrise-waves { opacity: .5; }
+
+/* Keep the same visual cadence throughout the collection and enquiry pages. */
+.section-heading { padding-inline: 0; gap: 60px; margin-bottom: 42px; }
+.section-heading h2, .location-copy h2 { font-size: clamp(50px, 4.5vw, 76px); font-weight: 400; line-height: 1.02; letter-spacing: -.035em; }
+.section-heading h2 em, .location-copy h2 em { color: #a07839; font-style: italic; font-family: var(--serif); }
+.section-heading .eyebrow, .location-copy > .eyebrow { color: #8b7957; font-size: 10px; margin-bottom: 22px; }
+.section-heading > p { font-size: 14px; color: #6a6b5d; line-height: 1.85; max-width: 340px; }
+.section-heading > p span { font-size: 12px; color: #81806f; margin-top: 12px; }
+.gallery { gap: 20px; }
+.gallery figure { border: 0; border-radius: 4px; }
+.gallery-primary { height: 640px; }
+.gallery-aside { gap: 20px; }
+.gallery-aside figure { height: 390px; }
+.gallery figcaption { font-size: 10px; letter-spacing: .12em; left: 25px; bottom: 24px; }
+.gallery-note { border: 1px solid #dfd5c0; border-radius: 4px; background: #f2e9d9; padding: 28px 32px; min-height: 230px; }
+.gallery-note > svg { color: #a78954; }
+.gallery-note p { font-family: var(--serif); font-size: clamp(29px, 2.6vw, 41px); line-height: 1.1; font-weight: 400; letter-spacing: -.02em; }
+.gallery-note p em { font-family: var(--serif); font-style: italic; color: #9c7c43; }
+.gallery-note > span { font-size: 9px; letter-spacing: .13em; color: #7a765f; border-color: #d6cbb3; }
+.architecture > .fine-print { padding-left: 0; }
+.location-section { margin-top: 120px; padding-block: 88px; background: #f0e8da; border-block: 1px solid #e4d9c6; }
+.location-grid { padding-inline: 0; gap: 100px; }
+.location-copy > p:not(.eyebrow):not(.fine-print) { max-width: 415px; font-size: 14px; line-height: 1.9; color: #6e6f61; }
+.location-landmark > svg { border-color: #c5b898; width: 30px; height: 30px; padding: 12px; color: #8b754e; }
+.location-landmark strong { font-family: var(--serif); font-size: 25px; font-weight: 500; }
+.location-landmark span { font-size: 12px; color: #787867; }
+.map-preview { border-radius: 4px; border: 0; box-shadow: none; height: 540px; }
+.map-preview > span { font-size: 12px; border-radius: 2px; background: #fcf8eeec; color: #394b3c; }
+.downloads { padding-inline: 0; }
+.download-grid { gap: 25px; }
+.download-card { border: 1px solid #d9ceb8; border-radius: 3px; background: #f8f1e6; padding: 35px 30px; box-shadow: none; grid-template-columns: 34px 1fr 40px; gap: 24px; }
+.download-card:hover, .price-card:hover { background: #f1e8d8; box-shadow: none; }
+.download-card h3 { font-family: var(--serif); font-size: 36px; font-weight: 400; letter-spacing: -.025em; line-height: 1.08; }
+.download-card .eyebrow { color: #8f7d59; font-size: 9px; letter-spacing: .13em; }
+.download-card p { font-size: 13px; color: #727264; }
+.doc-icon { width: 32px; }
+.doc-icon svg { width: 31px; height: 34px; color: #9f8657; }
+.document-meta { font-size: 9px; letter-spacing: .055em; color: #8a8272; flex-wrap: wrap; }
+.download-card > .round-button { width: 40px; height: 40px; background: transparent; border: 1px solid #c7bda5; }
+.enquiry-section { margin-top: 120px; border: 0; border-radius: 4px; box-shadow: none; grid-template-columns: .95fr 1.1fr; }
+.enquiry-intro { padding: 58px 55px; background: #244836; min-height: 680px; }
+.enquiry-intro .section-label { font-size: 10px; color: #e2dbbd; letter-spacing: .13em; }
+.enquiry-intro .tiny-square { background: #c0a671; }
+.enquiry-intro h2 { font-family: var(--serif); font-size: clamp(57px, 4.8vw, 80px); font-weight: 400; line-height: 1.02; letter-spacing: -.035em; margin: 40px 0 25px; }
+.enquiry-intro h2 em { color: #d9bd87; font-family: var(--serif); font-style: italic; }
+.enquiry-intro > p { font-size: 14px; color: #d0d4bf; line-height: 1.9; }
+.enquiry-bottom { color: #c3c8ac; font-size: 9px; letter-spacing: .14em; }
+.enquiry-form-panel { padding: 58px 50px; background: #f3ebdd; }
+.enquiry-form-panel > .eyebrow { font-size: 10px; color: #8e7951; letter-spacing: .13em; }
+.enquiry-form-panel > h3 { font-family: var(--serif); font-size: 38px; letter-spacing: -.02em; font-weight: 400; }
+.form-description { font-size: 13px; color: #747265; line-height: 1.85; }
+.field label { font-size: 12px; color: #666b5c; }
+.field input, .field select, .field textarea { font-size: 14px; background: #fcf7ee; border-color: #d6cbb7; border-radius: 3px; }
+.consent { font-size: 11px; line-height: 1.7; color: #777365; }
+.form-note { font-size: 11px; color: #817b6b; }
+.enquiry-dialog { border-radius: 5px; }
+.enquiry-dialog h2 { font-size: 52px; font-weight: 400; letter-spacing: -.03em; }
+.modal-brand { font-size: 10px; letter-spacing: .13em; }
+.site-footer { padding: 60px 0 30px; }
+.footer-main { gap: 48px; }
+.footer-main > p { font-family: var(--serif); font-size: 31px; line-height: 1.15; letter-spacing: -.01em; }
+.developer > span { font-size: 9px; letter-spacing: .13em; color: #7d7b6b; }
+.footer-bottom { font-size: 11px; color: #727769; }
+.footer-bottom > button { font-size: 11px; }
+.footer-disclaimer { font-size: 10px; color: #8a8375; line-height: 1.9; max-width: 1100px; }
+
+@media (min-width: 1700px) {
+  .sunrise-hero { min-height: 860px; }
+  .sunrise-content { padding-top: 58px; }
+  .sunrise-copy { width: 640px; max-width: 47%; }
+  .sunrise-description { font-size: 16px; }
+  .sunrise-offer { margin-top: 33px; width: 375px; }
+}
+@media (max-width: 1150px) {
+  .wrap { width: calc(100% - 88px); }
+  .sunrise-header { height: 118px; gap: 28px; }
+  .sunrise-brand { width: 137px; }
+  .brand-name { font-size: 42px; }
+  .sunrise-navigation { gap: 24px; }
+  .sunrise-navigation a { font-size: 11px; }
+  .sunrise-hero { height: auto; min-height: 780px; }
+  .sunrise-content { padding-top: 46px; }
+  .sunrise-content h1 { font-size: clamp(58px, 6.5vw, 76px); }
+  .sunrise-copy { max-width: 47%; }
+  .sunrise-eyebrow { font-size: 8px; letter-spacing: .11em; gap: 10px; margin-bottom: 24px; }
+  .sunrise-eyebrow > span { width: 20px; }
+  .sunrise-description { font-size: 14px; }
+  .sunrise-offer { margin-top: 25px; width: 330px; padding-block: 22px; }
+  .offer-price { font-size: 59px; }
+  .sunrise-actions { gap: 12px 18px; margin-top: 23px; }
+  .sunrise-primary, .sunrise-secondary { font-size: 10px; gap: 12px; }
+  .sunrise-primary { padding-inline: 17px; }
+  .location-grid { gap: 55px; }
+  .gallery-primary { height: 600px; }
+  .gallery-aside figure { height: 350px; }
+  .gallery-note { padding: 25px; }
+  .download-card { padding: 30px 24px; gap: 16px; grid-template-columns: 28px 1fr 34px; }
+  .download-card > .round-button { width: 34px; height: 34px; }
+  .download-card h3 { font-size: 32px; }
+  .enquiry-intro { padding: 48px 38px; }
+  .enquiry-form-panel { padding: 48px 34px; }
+}
+@media (max-width: 800px) {
+  .wrap { width: calc(100% - 48px); }
+  .sunrise-header { height: 110px; gap: 22px; }
+  .sunrise-brand { width: 124px; }
+  .brand-name { font-size: 38px; }
+  .brand-sun { height: 33px; width: 78px; }
+  .brand-byline { font-size: 6px; }
+  .sunrise-navigation { gap: 16px; }
+  .sunrise-navigation a { font-size: 10px; }
+  .developer-brand img { width: 53px; height: 51px; }
+  .sunrise-hero { min-height: 790px; }
+  .sunrise-copy { max-width: 48%; }
+  .sunrise-content { padding-top: 40px; }
+  .sunrise-content h1 { font-size: clamp(45px, 6.5vw, 58px); letter-spacing: -.04em; }
+  .sunrise-eyebrow { font-size: 7px; letter-spacing: .08em; gap: 8px; }
+  .sunrise-eyebrow > span { width: 16px; }
+  .sunrise-content .sunrise-rule { margin: 25px 0 21px; }
+  .sunrise-offer { padding-block: 20px; }
+  .offer-price { font-size: 56px; }
+  .offer-regular { font-size: 13px; }
+  .offer-qualifier p { font-size: 13px; }
+  .offer-qualifier > svg { display: none; }
+  .sunrise-actions { flex-direction: column; align-items: flex-start; width: 100%; gap: 7px; }
+  .sunrise-primary, .sunrise-secondary { font-size: 11px; justify-content: space-between; }
+  .sunrise-primary { width: 100%; min-height: 49px; }
+  .sunrise-secondary { padding-inline: 0; min-height: 43px; }
+  .scene-controls button { font-size: 9px; }
+  .section-space { margin-top: 85px; }
+  .section-heading { gap: 30px; margin-bottom: 32px; }
+  .section-heading h2, .location-copy h2 { font-size: 53px; }
+  .section-heading > p { font-size: 13px; max-width: 280px; }
+  .gallery-primary { height: 520px; }
+  .gallery-aside figure { height: 290px; }
+  .gallery-note { padding: 22px; grid-template-columns: 1fr; gap: 12px; min-height: 210px; }
+  .gallery-note > svg { display: none; }
+  .gallery-note > span { font-size: 8px; }
+  .gallery-note p { font-size: 32px; }
+  .location-section { margin-top: 85px; padding-block: 65px; }
+  .location-grid { gap: 35px; }
+  .map-preview { height: 460px; }
+  .download-grid { grid-template-columns: 1fr; }
+  .download-card { grid-template-columns: 38px 1fr 42px; padding: 30px; gap: 25px; }
+  .download-card > .round-button { width: 42px; height: 42px; }
+  .enquiry-section { margin-top: 85px; grid-template-columns: 1fr; }
+  .enquiry-intro { min-height: 400px; padding: 42px; }
+  .enquiry-intro h2 { max-width: 440px; font-size: 64px; margin-block: 28px 22px; }
+  .enquiry-intro h2 br:nth-of-type(2) { display: none; }
+  .enquiry-intro > img { position: absolute; bottom: 30px; right: 35px; width: 92px; height: 82px; }
+  .enquiry-form-panel { padding: 42px; }
+}
+@media (max-width: 600px) {
+  .wrap { width: calc(100% - 44px); }
+  .sunrise-header { height: 104px; gap: 22px; }
+  .sunrise-navigation { display: none; }
+  .sunrise-brand { width: 119px; }
+  .brand-name { font-size: 37px; }
+  .brand-sun { height: 31px; width: 72px; }
+  .brand-byline { font-size: 6px; letter-spacing: .25em; }
+  .developer-brand img { width: 49px; height: 47px; }
+  .sunrise-hero { height: auto; min-height: 0; max-height: none; }
+  .sunrise-content { padding-top: 30px; padding-bottom: 440px; }
+  .sunrise-copy { width: 100%; max-width: 100%; }
+  .sunrise-content h1 { font-size: clamp(57px, 13.9vw, 78px); line-height: .97; letter-spacing: -.045em; }
+  .sunrise-eyebrow { font-size: 8px; letter-spacing: .12em; gap: 11px; margin-bottom: 24px; }
+  .sunrise-eyebrow > span { width: 22px; }
+  .sunrise-content .sunrise-rule { margin: 25px 0 20px; }
+  .sunrise-description { font-size: 14px; line-height: 1.8; }
+  .sunrise-offer { width: 100%; max-width: 355px; margin-top: 27px; padding-block: 21px; }
+  .offer-eyebrow { font-size: 9px; margin-bottom: 9px; }
+  .offer-price { font-size: 60px; }
+  .offer-regular { font-size: 13px; }
+  .offer-qualifier p { font-size: 13px; }
+  .offer-qualifier > svg { display: block; }
+  .sunrise-actions { margin-top: 24px; flex-direction: row; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .sunrise-primary, .sunrise-secondary { flex: initial; font-size: 11px; min-height: 49px; padding-block: 13px; }
+  .sunrise-primary { width: auto; padding-inline: 18px; }
+  .sunrise-secondary { min-height: 43px; padding-inline: 0; }
+  .sunrise-villas { bottom: 67px; }
+  .sunrise-bottom { width: calc(100% - 44px); bottom: 22px; }
+  .sunrise-scroll { font-size: 0; }
+  .scene-controls { gap: 13px; }
+  .scene-controls button { font-size: 9px; }
+  .section-space { margin-top: 70px; }
+  .architecture, .downloads { padding-inline: 0; }
+  .section-heading { display: block; padding-inline: 0; margin-bottom: 30px; }
+  .section-heading h2, .location-copy h2 { font-size: clamp(44px, 11.8vw, 58px); line-height: 1.02; }
+  .section-heading .eyebrow, .location-copy > .eyebrow { font-size: 9px; margin-bottom: 18px; }
+  .section-heading > p { margin-top: 22px; font-size: 13px; max-width: 100%; }
+  .section-heading > p br { display: none; }
+  .gallery { grid-template-columns: 1fr; gap: 16px; }
+  .gallery-primary { height: 440px; }
+  .gallery-aside { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  .gallery-aside figure { height: 340px; }
+  .gallery figcaption, .gallery-aside figcaption { font-size: 10px; left: 20px; right: 20px; bottom: 20px; gap: 15px; }
+  .gallery-aside figcaption > span { font-size: 10px; letter-spacing: .1em; }
+  .gallery-aside .round-button { width: 42px; height: 42px; }
+  .gallery-note { min-height: 170px; padding: 28px; grid-template-columns: 35px 1fr; gap: 18px; }
+  .gallery-note > svg { display: block; width: 28px; height: 28px; }
+  .gallery-note p { font-size: 35px; }
+  .gallery-note > span { font-size: 8px; letter-spacing: .1em; }
+  .fine-print { font-size: 10px !important; }
+  .location-section { margin-top: 70px; padding-block: 52px; }
+  .location-grid { grid-template-columns: 1fr; padding-inline: 0; gap: 35px; }
+  .location-copy h2 br { display: initial; }
+  .location-copy > p:not(.eyebrow):not(.fine-print) { font-size: 13px; margin-top: 21px; }
+  .location-landmark { margin-block: 27px; }
+  .map-preview { height: 390px; }
+  .map-preview > span { font-size: 11px; padding: 16px 14px; left: 15px; right: 15px; bottom: 15px; }
+  .download-card { display: grid; grid-template-columns: 26px 1fr 34px; gap: 16px; padding: 27px 21px; }
+  .download-card > .doc-icon { width: 26px; height: 36px; }
+  .doc-icon svg { width: 26px; height: 30px; }
+  .download-card h3 { font-size: 30px; margin: 12px 0; }
+  .download-card .eyebrow { font-size: 8px; }
+  .download-card p { font-size: 13px; line-height: 1.8; }
+  .download-card > .round-button { width: 34px; height: 34px; }
+  .document-meta { font-size: 8px; line-height: 1.7; gap: 5px; margin-top: 22px; }
+  .enquiry-section { margin-top: 70px; border-radius: 3px; }
+  .enquiry-intro { padding: 35px 27px; min-height: 415px; }
+  .enquiry-intro .section-label { font-size: 9px; }
+  .enquiry-intro h2 { font-size: 55px; max-width: 260px; margin-block: 28px 20px; }
+  .enquiry-intro > p { font-size: 13px; max-width: 260px; }
+  .enquiry-intro > img { width: 72px; height: 70px; right: 23px; bottom: 27px; }
+  .enquiry-bottom { font-size: 8px; padding-top: 38px; max-width: 220px; }
+  .enquiry-form-panel { padding: 34px 25px; }
+  .enquiry-form-panel > h3 { font-size: 33px; }
+  .enquiry-form-panel > .eyebrow { font-size: 9px; }
+  .form-description { font-size: 13px; }
+  .field label { font-size: 11px; }
+  .field input, .field select, .field textarea { font-size: 16px; }
+  .consent, .form-note { font-size: 10px; }
+  .enquiry-dialog { padding: 35px 25px; border-radius: 5px; }
+  .enquiry-dialog h2 { font-size: 44px; }
+  .enquiry-dialog .field input, .enquiry-dialog .field select, .enquiry-dialog .field textarea { font-size: 16px; }
+  .site-footer { padding: 45px 0 28px; }
+  .footer-main { gap: 25px; }
+  .footer-main > p { font-size: 27px; }
+  .developer > span { font-size: 9px; }
+  .footer-bottom { font-size: 10px; gap: 20px 14px; }
+  .footer-bottom > button { font-size: 10px; }
+  .footer-disclaimer { font-size: 9px; }
+}
+@media (max-width: 380px) {
+  .sunrise-content h1 { font-size: 54px; }
+  .sunrise-eyebrow { font-size: 7px; }
+  .sunrise-actions { gap: 10px; }
+  .sunrise-primary, .sunrise-secondary { font-size: 10px; gap: 12px; }
+  .sunrise-primary { padding-inline: 14px; }
+  .download-card { grid-template-columns: 1fr 32px; }
+  .download-card > .doc-icon { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sunrise-primary:hover, .sunrise-secondary:hover, .download-card:hover { transform: none; }
+}

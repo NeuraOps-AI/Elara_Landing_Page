@@ -1,0 +1,11 @@
+data/
+tmp/
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+
+# Local visual checks; retain the prompts needed to reproduce project artwork.
+output/*
+!output/*-generation.txt

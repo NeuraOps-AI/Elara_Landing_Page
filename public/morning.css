@@ -1,0 +1,49 @@
+/* An immersive photographic interlude, scoped to the terrace experience. */
+.morning-section{padding-top:106px;background:var(--paper,#fbf3e8);overflow:hidden}
+.morning-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:60px;padding-bottom:49px}
+.morning-intro .eyebrow{font-size:9px;letter-spacing:2.2px;font-weight:500;color:#8a7b60;margin-bottom:22px}
+.morning-intro h2{font-family:var(--serif);font-size:clamp(48px,4.7vw,74px);font-weight:400;letter-spacing:-2px;line-height:1.02}
+.morning-intro h2 em{color:#ac7b39;font-family:var(--serif);font-style:italic}
+.morning-intro>p{font-family:var(--sans);font-size:14px;line-height:1.95;color:#7c796e;max-width:410px;padding-bottom:5px}
+.morning-stage{position:relative;width:100%;height:clamp(530px,52.5vw,800px);isolation:isolate;overflow:hidden;background:#e0e8e7;touch-action:pan-y pinch-zoom;outline:0;cursor:grab}
+.morning-stage[data-dragging="true"]{cursor:grabbing}
+.morning-stage:focus-visible{outline:2px solid #ac7b39;outline-offset:-7px}
+.morning-fallback,#morning-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.morning-fallback{object-fit:cover;object-position:41% 50%;z-index:0;transition:opacity .35s ease}
+#morning-canvas{z-index:1;opacity:0;transition:opacity .35s ease;pointer-events:none}
+.morning-stage[data-ready="true"] #morning-canvas{opacity:1}
+.morning-stage[data-ready="true"] .morning-fallback{opacity:0}
+.morning-vignette{position:absolute;inset:0;z-index:2;pointer-events:none;background:linear-gradient(0deg,#253b2b40 0%,#253b2b0d 18%,transparent 36%),linear-gradient(90deg,#253b2b0a 0%,transparent 32%),linear-gradient(180deg,#263b3314 0%,transparent 20%)}
+.morning-scene-top{position:absolute;left:5.2%;right:5.2%;top:32px;z-index:3;display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff9ed;pointer-events:none}
+.morning-kicker{font-family:var(--sans);font-size:9px;letter-spacing:2.3px;font-weight:500;text-shadow:0 1px 7px #352e2180}
+#morning-direction{font-family:var(--sans);font-size:11px;font-weight:400;letter-spacing:.4px;color:#4c5b43;text-shadow:0 1px 12px #fff8e999}
+.morning-scene-copy{position:absolute;z-index:3;top:93px;left:27%;max-width:260px;pointer-events:none;color:#344531;text-shadow:0 1px 22px #fff6e780}
+.morning-time{font-family:var(--sans);font-size:8px;font-weight:500;letter-spacing:1.8px;margin:0 0 13px;opacity:.85}
+#morning-caption{font-family:var(--serif);font-size:36px;font-weight:400;line-height:1.12;letter-spacing:-.7px;margin:0}
+.morning-toolbar{position:absolute;left:5.2%;right:5.2%;bottom:29px;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:30px;cursor:default;color:#fff9ec}
+.morning-view-switch{display:flex;align-items:center;gap:19px;padding:6px 18px;border:1px solid #fff6df55;border-radius:100px;background:#2430248a;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.morning-view-switch>span{height:15px;width:1px;background:#fff5df40}
+.morning-toolbar button{border:0;background:transparent;display:inline-flex;align-items:center;justify-content:center;gap:9px;font-family:var(--sans);font-size:12px;font-weight:400;color:inherit;min-height:44px;padding:0;cursor:pointer;transition:color .2s,opacity .2s}
+.morning-toolbar button:disabled{opacity:.4;cursor:wait}
+.morning-toolbar button:focus-visible{outline:2px solid #fff6d5;outline-offset:5px;border-radius:3px}
+.morning-view-switch button{color:#fff6e0d6;position:relative}
+.morning-view-switch button[aria-pressed="true"]{color:#fff9ee}
+.morning-view-switch button[aria-pressed="true"]::after{content:'';height:2px;width:16px;position:absolute;left:0;bottom:5px;border-radius:2px;background:#e3c994}
+.morning-view-switch button:hover{color:#fff9ee}
+.morning-toolbar svg{width:15px;height:15px;stroke-width:1.2}
+.morning-playback{display:flex;align-items:center;gap:23px;padding:4px 16px;border:1px solid #fff6df38;border-radius:100px;background:#24302480;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.morning-playback button{font-size:12px;color:#fff9ecdb;letter-spacing:.3px}
+.morning-playback button:hover{color:#fff}
+.morning-playback button+button{padding-left:23px;border-left:1px solid #fff3d938}
+.morning-notes{display:flex;align-items:flex-start;justify-content:space-between;gap:30px;padding-top:19px;padding-bottom:9px}
+.morning-notes p{font-family:var(--sans);font-size:11px;line-height:1.7;color:#8f897a;margin:0}
+.morning-notes p:last-child{text-align:right;font-size:10px;color:#8e8677}
+.morning-stage[data-interactive="false"]{cursor:default}
+@media(min-width:1700px){.morning-stage{height:840px}.morning-scene-copy{top:112px}}
+@media(max-width:1100px){.morning-section{padding-top:85px}.morning-intro{gap:35px;padding-bottom:38px}.morning-intro h2{font-size:57px}.morning-intro>p{font-size:13px}.morning-stage{height:600px}.morning-scene-top,.morning-toolbar{left:4.5%;right:4.5%}.morning-scene-copy{left:27%;top:87px;max-width:240px}.morning-view-switch{gap:15px;padding-inline:16px}.morning-toolbar{gap:18px}.morning-playback{gap:17px}.morning-playback button+button{padding-left:17px}}
+@media(max-width:760px){.morning-section{padding-top:70px}.morning-intro{align-items:flex-start;gap:28px}.morning-intro h2{font-size:48px}.morning-intro>p{font-size:13px;line-height:1.85;max-width:290px}.morning-stage{height:590px}.morning-scene-top{top:26px;left:24px;right:24px}.morning-kicker{font-size:8px;letter-spacing:1.7px}#morning-direction{font-size:10px}.morning-scene-copy{left:27%;top:79px;max-width:205px}.morning-time{font-size:8px;letter-spacing:1.3px}#morning-caption{font-size:34px}.morning-toolbar{left:24px;right:24px;bottom:22px;flex-wrap:wrap;gap:10px}.morning-view-switch{gap:17px;padding:4px 16px}.morning-toolbar button{font-size:11px}.morning-playback{gap:13px}.morning-playback button+button{padding-left:13px}.morning-playback button{font-size:11px}.morning-notes{gap:25px}}
+@media(max-width:560px){.morning-intro{flex-direction:column;gap:22px;padding-bottom:32px}.morning-intro .eyebrow{font-size:8px;letter-spacing:1.7px;margin-bottom:18px}.morning-intro h2{font-size:52px;letter-spacing:-1.3px}.morning-intro>p{font-size:13px;max-width:100%;line-height:1.85}.morning-stage{height:580px}.morning-scene-top{top:23px;left:20px;right:20px;gap:12px}.morning-kicker{font-size:8px;letter-spacing:1.3px}#morning-direction{font-size:10px;max-width:185px;text-align:right}.morning-scene-copy{left:20px;top:71px;max-width:205px}.morning-time{font-size:8px;letter-spacing:1.2px;margin-bottom:10px}#morning-caption{font-size:31px;letter-spacing:-.6px}.morning-toolbar{left:20px;right:20px;bottom:18px;gap:9px;justify-content:center}.morning-view-switch{justify-content:center;gap:18px;padding:3px 17px}.morning-view-switch>span{height:13px}.morning-toolbar button{font-size:11px;min-height:44px}.morning-toolbar svg{width:13px;height:13px}.morning-playback{gap:21px;min-height:44px}.morning-playback button{min-height:44px;font-size:11px}.morning-playback button+button{padding-left:21px}.morning-notes{flex-direction:column;gap:7px;padding-top:15px}.morning-notes p{line-height:1.6}.morning-notes p:last-child{text-align:left}.morning-vignette{background:linear-gradient(0deg,#253b2b59 0%,#253b2b0a 24%,transparent 42%),linear-gradient(180deg,#263b3314 0%,transparent 24%)}}
+/* Keep the photographed rooftop wheel clear of the caption on narrower views. */
+@media(max-width:1100px){.morning-stage[data-view="wonderla"] .morning-scene-copy{top:50px}.morning-stage[data-view="wonderla"] #morning-caption{font-size:26px;line-height:1.08}.morning-stage[data-view="wonderla"] .morning-time{font-size:7px;line-height:1;margin-bottom:8px}}
+@media(max-width:760px){.morning-stage[data-view="wonderla"] .morning-scene-copy{top:54px}}
+@media(prefers-reduced-motion:reduce){.morning-stage *{transition:none!important}}

@@ -1,0 +1,13 @@
+{
+  "name": "elara-local",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ELARA property website and local leads CRM",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node --watch server.mjs",
+    "test": "node --test tests/server.test.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,201 @@
+/* ELARA's morning composition. Scene geometry lives in sunrise-scene.js. */
+:root{--paper:#fbf3e8;--ink:#203c2e;--muted:#797368;--accent:#224c35;--line:#ded5c6;--forest:#224c35;--clay:#b07a30;--serif:Georgia,'Times New Roman',serif;--sans:'Segoe UI',Arial,sans-serif}
+html{scroll-padding-top:24px}body{background:var(--paper);color:var(--ink)}body::before{display:none}h1,h2{font-family:var(--serif);font-weight:400;letter-spacing:-2px}h1 em,h2 em{font-family:var(--serif);font-style:italic;font-weight:400;color:#a56c19}::selection{background:#e7d4aa;color:#1c3929}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline-color:#aa782d}.wrap{max-width:1536px;width:calc(100% - 128px)}
+.sunrise-header{height:146px;display:flex;align-items:center;justify-content:space-between;gap:48px;position:relative;z-index:5}.sunrise-brand{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:174px}.brand-sun{width:100px;height:47px;stroke:#b78028;stroke-width:1.4}.brand-name{font-family:Georgia,serif;font-size:48px;line-height:1;letter-spacing:4px;font-weight:400;margin-top:-1px}.brand-byline{font-size:8px;letter-spacing:3.7px;margin-top:9px;margin-left:4px}.sunrise-navigation{display:flex;align-items:center;justify-content:center;gap:42px;margin-left:auto;margin-right:auto;padding-left:50px;border-left:1px solid #d9ccba}.sunrise-navigation a{font-size:13px;padding:14px 0;position:relative;color:#4b5047}.sunrise-navigation a::after{content:'';height:1px;position:absolute;left:0;right:0;bottom:2px;transform:scaleX(0);background:#b58334;transition:transform .25s}.sunrise-navigation a:hover::after,.sunrise-navigation a.current::after{transform:scaleX(1)}.sunrise-navigation a.current{color:#214631;font-weight:600}.developer-brand img{object-fit:contain;filter:brightness(0) saturate(100%) invert(20%) sepia(19%) saturate(1211%) hue-rotate(93deg) brightness(91%);width:76px;height:72px}.sunrise-header .menu-button{flex-shrink:0}
+.sunrise-hero{height:calc(100svh - 146px);min-height:710px;max-height:920px;position:relative;isolation:isolate;overflow:hidden}.sunrise-visual{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}.sunrise-sky{position:absolute;inset:-180px 0 0;background:radial-gradient(ellipse at 73% 38%,#ffdfa7a0 0,#f7d7b080 20%,#f7e6d473 44%,transparent 70%),linear-gradient(105deg,#fbf3e8 26%,#fcebdc 72%,#f6e1ce)}.sunrise-villas{position:absolute;right:-4%;bottom:6%;width:auto;max-width:none;height:88%;object-fit:contain;object-position:center bottom;z-index:2}.sunrise-hero[data-scene-ready="true"] .sunrise-villas,.sunrise-visual[data-scene-ready="true"] .sunrise-villas{opacity:0}.sunrise-hero[data-scene-ready="true"] .fallback-sun,.sunrise-visual[data-scene-ready="true"] .fallback-sun{opacity:0}.fallback-sun{position:absolute;width:190px;aspect-ratio:1;border-radius:50%;background:#fff1c7;left:66%;top:19%;box-shadow:0 0 80px 45px #ffce7270,0 0 180px 90px #fbd7a444;z-index:1}#sunrise-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.sunrise-orbits{position:absolute;left:43%;top:2%;width:54%;aspect-ratio:1;z-index:1;opacity:.68}.sunrise-orbits i{position:absolute;border:1px solid #fffcf5c4;border-radius:50%;inset:0}.sunrise-orbits i:nth-child(2){inset:6%}.sunrise-orbits i:nth-child(3){inset:12%}.sunrise-edge{position:absolute;inset:0;z-index:4;background:linear-gradient(90deg,#fbf3e8 5%,#fbf3e8e6 27%,#fbf3e800 45%),linear-gradient(0deg,#fbf3e8 0%,#fbf3e800 18%);pointer-events:none}.sunrise-content{position:relative;z-index:5;padding-top:58px;pointer-events:none}.sunrise-eyebrow{display:flex;align-items:center;gap:12px;font-size:9px;font-weight:500;letter-spacing:2.1px;line-height:1.5;color:#79715e;margin-bottom:28px}.sunrise-eyebrow>span{width:23px;height:1px;background:#b7832e}.sunrise-content h1{font-size:clamp(58px,5.45vw,85px);line-height:1.04;letter-spacing:-3.5px;max-width:640px}.sunrise-content h1 em{display:inline-block;font-size:1.1em;line-height:1.05;padding-right:8px;margin-top:1px;color:#a96d17}.sunrise-rule{display:block;width:49px;height:2px;background:#b98029;margin:28px 0 22px}.sunrise-description{font-size:17px;font-weight:400;line-height:1.6;color:#5f6055;letter-spacing:.15px}.sunrise-actions{display:flex;align-items:center;gap:23px;margin-top:35px;pointer-events:auto;width:max-content}.sunrise-primary{display:inline-flex;align-items:center;gap:28px;background:#234c35;color:#fffcf4;border:1px solid #234c35;border-radius:50px;padding:15px 24px;min-height:51px;font-size:12px;transition:background .2s,transform .2s;box-shadow:0 4px 18px #25433210}.sunrise-primary:hover{background:#153d28;transform:translateY(-2px)}.sunrise-primary svg,.sunrise-explore svg{width:18px;height:18px}.sunrise-explore{display:flex;align-items:center;gap:14px;min-height:48px;font-size:12px;border-bottom:1px solid #b6b7a1;transition:color .2s}.sunrise-explore:hover{color:#a16b1d}.sunrise-bottom{position:absolute;bottom:43px;left:0;right:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:20px}.sunrise-scroll{display:flex;align-items:center;gap:13px;font-size:8px;letter-spacing:1.7px;color:#767a68}.sunrise-scroll>span{height:36px;width:36px;display:grid;place-items:center;border:1px solid #b1b7a6;border-radius:50%;font-size:19px;color:#31513a}.scene-controls{display:flex;align-items:center;gap:16px;font-size:9px;letter-spacing:.3px;color:#59604f}.scene-status{display:flex;align-items:center;gap:8px;margin-right:7px}.scene-status i{width:5px;height:5px;border-radius:50%;background:#b58029;box-shadow:0 0 0 4px #b5802910}.scene-controls button{border:0;border-left:1px solid #c9c5b5;background:transparent;min-height:44px;padding:0 0 0 15px;display:flex;align-items:center;gap:7px;font-size:9px;color:#4c5947;transition:opacity .2s}.scene-controls button:hover{color:#a16b1d}.scene-controls button:disabled{opacity:.45;cursor:default}.scene-controls svg{height:14px;width:14px}.motion-play{display:none}#toggle-motion[aria-pressed="true"] .motion-play{display:block}#toggle-motion[aria-pressed="true"] .motion-pause{display:none}.sunrise-waves{position:absolute;z-index:5;left:0;bottom:-35px;width:100%;height:110px;fill:none;stroke:#cf9d5380;stroke-width:.7;pointer-events:none}
+.sunrise-story{position:relative;isolation:isolate;min-height:540px;overflow:hidden;padding-top:80px;background:radial-gradient(ellipse at 75% 80%,#efdcc0 0,transparent 60%),#fbf3e8}.sunrise-story-inner{position:relative;z-index:3}.sunrise-story-copy{max-width:600px;padding-bottom:70px}.story-sun{height:66px;width:126px;stroke:#b78129;stroke-width:1.05;margin-bottom:24px}.sunrise-story h2{font-size:clamp(36px,3.45vw,53px);line-height:1.15;letter-spacing:-1.7px}.sunrise-story h2 em{white-space:nowrap}.sunrise-story .sunrise-rule{margin-top:25px;margin-bottom:21px}.sunrise-story p{font-size:14px;color:#777163;line-height:1.85}.sunrise-story .text-link{font-size:11px;margin-top:22px;border-color:#b9b29c}.story-architecture{position:absolute;inset:0 0 0 46%;overflow:hidden;z-index:1;mask-image:linear-gradient(90deg,transparent,black 27%)}.story-architecture>img{position:absolute;left:18%;top:54px;width:175%;max-width:none;height:auto}.story-halo{position:absolute;top:39px;left:15%;width:490px;height:490px;border-radius:50%;border:1px solid #c6994c60;box-shadow:0 0 0 16px #fbf3e8,0 0 0 17px #c6994c35,0 0 0 30px #fbf3e8,0 0 0 31px #c6994c25}
+/* Carry the morning palette into the existing project sections and forms. */
+.section-heading h2 em,.location-copy h2 em{font-family:var(--serif);font-style:italic;color:#a56c19}.button-dark{background:#234c35}.button-dark:hover{background:#173b28}.gallery-note{background:#eee3cd}.gallery-note p em{color:#9b742b}.location-section{background:#efe7d8}.location-copy>p:not(.eyebrow),.section-heading>p{color:#797365}.enquiry-intro{background:#234c35}.download-card,.price-card{background:#f5eddf;border-color:#e1d6c4}.enquiry-form-panel{background:#f5eddf}.site-footer .developer img{filter:brightness(.5)}.field input,.field select,.field textarea{background:#fffaf2;border-color:#dcd4c3}.field input:focus,.field select:focus,.field textarea:focus{border-color:#a88a58}.consent input{accent-color:#234c35}dialog,.dialog-close{background:#fbf5eb}.success-downloads>a,.success-icon{background:#e8ecdc}.success-downloads>a:hover{background:#dce5cc}.toast{background:#234c35}.modal-brand{color:#8f733e}.enquiry-dialog h2 em{color:#a56c19}.form-error{background:#f9e8df}.footer-brand img{filter:brightness(.5)}
+@media(min-width:1700px){.sunrise-villas{right:-3%;width:auto;height:88%}.sunrise-content{padding-top:95px}.sunrise-hero{min-height:810px}.sunrise-content h1{font-size:92px}.sunrise-actions{margin-top:40px}}
+@media(max-width:1150px){.wrap{width:calc(100% - 80px)}.sunrise-header{height:130px;gap:30px}.sunrise-brand{width:145px}.brand-name{font-size:42px}.brand-sun{width:86px;height:40px}.brand-byline{font-size:7px;letter-spacing:3px}.sunrise-navigation{padding-left:28px;gap:28px}.sunrise-navigation a{font-size:12px}.developer-brand img{width:65px;height:62px}.sunrise-hero{height:calc(100svh - 130px);min-height:720px}.sunrise-content{padding-top:55px}.sunrise-content h1{font-size:65px}.sunrise-eyebrow{font-size:8px;letter-spacing:1.4px}.sunrise-villas{width:auto;height:80%;right:-17%;bottom:8%}.sunrise-actions{flex-direction:column;align-items:flex-start;gap:8px;margin-top:28px}.sunrise-explore{margin-left:7px}.sunrise-orbits{left:40%;width:70%}.sunrise-edge{background:linear-gradient(90deg,#fbf3e8 5%,#fbf3e8dd 29%,#fbf3e800 49%),linear-gradient(0deg,#fbf3e8,#fbf3e800 18%)}.scene-status{display:none}.sunrise-story h2{font-size:42px}.story-architecture{left:43%}.sunrise-story-copy{max-width:520px}}
+@media(max-width:800px){.wrap{width:calc(100% - 48px)}.sunrise-header{height:115px;gap:24px}.sunrise-navigation{gap:19px;padding-left:20px}.sunrise-navigation a{font-size:11px}.developer-brand img{width:54px;height:54px}.sunrise-brand{width:125px}.brand-name{font-size:36px;letter-spacing:3px}.brand-byline{font-size:6px;letter-spacing:2.6px}.brand-sun{height:35px}.sunrise-content h1{font-size:57px}.sunrise-villas{width:auto;height:72%;right:-29%;bottom:10%}.sunrise-description{font-size:15px}.sunrise-content{padding-top:50px}.sunrise-eyebrow{font-size:7px;letter-spacing:1.2px}.sunrise-story h2{font-size:36px}.sunrise-story-copy{max-width:400px}.sunrise-story p{font-size:12px}.story-architecture{left:39%}.story-architecture>img{width:220%;top:110px;left:16%}.sunrise-story{min-height:500px}.sunrise-edge{background:linear-gradient(90deg,#fbf3e8 0%,#fbf3e8d9 26%,#fbf3e800 49%),linear-gradient(0deg,#fbf3e8,#fbf3e800 23%)}.sunrise-bottom{bottom:40px}}
+@media(max-width:600px){.wrap{width:calc(100% - 40px)}.sunrise-header{height:110px;gap:21px}.sunrise-brand{width:126px;align-items:center}.sunrise-navigation{display:none}.developer-brand{margin-left:auto}.developer-brand img{width:52px;height:52px}.sunrise-header .menu-button{display:flex;height:44px;width:30px;gap:6px;justify-content:center;border:0;background:none;padding:5px}.sunrise-header .menu-button>span{width:20px;height:1px;background:#244c34}.mobile-nav:not([hidden]){padding:12px 0 25px;gap:20px;color:#244c34;font-size:12px}.sunrise-hero{height:850px;min-height:850px;max-height:none}.sunrise-content{padding-top:27px}.sunrise-eyebrow{font-size:7px;letter-spacing:1.4px;gap:9px;margin-bottom:21px}.sunrise-eyebrow>span{width:16px}.sunrise-content h1{font-size:clamp(48px,11.8vw,68px);letter-spacing:-2px;line-height:1.05}.sunrise-rule{margin:23px 0 17px;width:40px}.sunrise-description{font-size:13px;line-height:1.6}.sunrise-description br{display:none}.sunrise-actions{flex-direction:row;gap:20px;margin-top:24px;align-items:center}.sunrise-primary{font-size:10px;padding:13px 17px;min-height:46px;gap:13px}.sunrise-primary svg,.sunrise-explore svg{width:14px;height:14px}.sunrise-explore{font-size:10px;gap:8px;min-height:40px;margin-left:0}.sunrise-villas{width:151%;max-width:640px;height:auto;right:calc(min(151vw, 640px) * -.325);bottom:7.5%}.sunrise-sky{background:radial-gradient(ellipse at 78% 55%,#ffd698b3,transparent 52%),#fbf3e8}.sunrise-orbits{left:11%;top:33%;width:108%;opacity:.7}.fallback-sun{width:140px;left:62%;top:46%}.sunrise-edge{background:linear-gradient(90deg,#fbf3e899 0%,transparent 17%),linear-gradient(0deg,#fbf3e8 0%,#fbf3e800 18%)}.sunrise-bottom{bottom:24px;width:calc(100% - 40px);gap:10px;align-items:center}.sunrise-scroll{font-size:0;letter-spacing:0;gap:0}.sunrise-scroll>span{width:34px;height:34px;font-size:16px}.scene-controls{gap:12px}.scene-controls button{font-size:9px;padding-left:12px}.scene-controls button:first-of-type{border-left:0;padding-left:0}.sunrise-waves{bottom:-29px;height:85px}.sunrise-story{min-height:610px;padding-top:53px}.story-sun{width:95px;height:48px;margin-bottom:23px}.sunrise-story h2{font-size:35px;line-height:1.18;letter-spacing:-1px}.sunrise-story-copy{max-width:100%;padding-bottom:50px}.sunrise-story p{font-size:12px;line-height:1.75}.sunrise-story .text-link{font-size:10px}.story-architecture{inset:295px -38% 0 20%;mask-image:linear-gradient(90deg,transparent,black 20%)}.story-architecture>img{width:160%;top:0;left:22%}.story-halo{height:300px;width:300px;top:15px;left:15%}.sunrise-story-inner{z-index:3}.section-space{margin-top:65px}}
+@media(max-width:380px){.sunrise-content h1{font-size:46px}.sunrise-hero{height:805px;min-height:805px}.sunrise-eyebrow{font-size:6px;letter-spacing:1px}.sunrise-actions{gap:12px}.sunrise-primary{padding-inline:14px;font-size:9px}.sunrise-explore{font-size:9px}.sunrise-story h2{font-size:31px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.sunrise-primary:hover{transform:none}}
+
+.scene-controls button[hidden]{display:none}
+/* Golden sunlight stays close to the sun instead of washing over the villas. */
+.sunrise-sky {
+  background: radial-gradient(ellipse at 73% 38%, #f8cc8d45 0, #f4d8b733 20%, transparent 54%),
+    linear-gradient(105deg, #fbf3e8 26%, #fbeee0 72%, #f7e8d8);
+}
+/* These opacities follow the scene clock; there is no independent CSS timer. */
+.sunrise-sky::before,
+.sunrise-sky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+.sunrise-sky::before {
+  background: radial-gradient(ellipse at 74% 67%, #efbea16b 0%, transparent 42%),
+    linear-gradient(105deg, #fbf3e8 27%, #d6d9df 60%, #b5c5d9);
+}
+.sunrise-sky::after {
+  background: radial-gradient(ellipse at 73% 49%, #efb66f66 0%, #f0cda633 27%, transparent 57%);
+}
+.sunrise-hero[data-scene-ready="true"] .sunrise-sky::before { opacity: var(--dawn-opacity, 0); }
+.sunrise-hero[data-scene-ready="true"] .sunrise-sky::after { opacity: var(--golden-opacity, 0); }
+.fallback-sun {
+  width: 116px;
+  background: radial-gradient(circle at 48% 46%, #fffaf0 0%, #fff3cb 45%, #f4cb8ba8 76%, #edbf7200 100%);
+  box-shadow: 0 0 18px 3px #fff0c240, 0 0 55px 17px #f4c17a1a;
+}
+.sunrise-visual::before{content:'';position:absolute;inset:0 0 auto;height:140px;background:linear-gradient(#fbf3e8,transparent);z-index:1;pointer-events:none}
+
+/* Reference offer: a quiet left column beside the animated architecture. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.sunrise-hero { min-height: 830px; max-height: 1000px; }
+.sunrise-content { padding-top: 28px; }
+.sunrise-copy { width: 500px; max-width: 46%; }
+.sunrise-eyebrow { margin-bottom: 20px; }
+.sunrise-content h1 {
+  font-size: clamp(54px, 4.45vw, 72px);
+  line-height: 1.035;
+  letter-spacing: -2.4px;
+}
+.sunrise-content h1 em { font-size: 1.12em; }
+.sunrise-content .sunrise-rule { margin: 23px 0 20px; }
+.sunrise-description { font-size: 20px; line-height: 1.45; color: #484b41; }
+.sunrise-offer {
+  width: 355px;
+  max-width: 100%;
+  margin-top: 28px;
+  padding: 22px 27px 23px;
+  border: 1px solid #d29b43;
+  border-radius: 20px;
+  background: linear-gradient(120deg, #fff8ebd9, #fff4e4ba);
+  box-shadow: inset 0 0 0 2px #fffaf088, 0 14px 40px #ac7b2310;
+  pointer-events: auto;
+}
+.offer-price {
+  font-family: var(--serif);
+  font-size: 53px;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  color: #1d452e;
+}
+.offer-regular { font-size: 16px; line-height: 1.5; margin-top: 3px; color: #4c4c43; }
+.offer-regular del {
+  margin-left: 7px;
+  text-decoration-color: #9b5928;
+  text-decoration-thickness: 1.5px;
+}
+.offer-qualifier {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-top: 1px solid #c8a67255;
+  margin-top: 18px;
+  padding-top: 16px;
+}
+.offer-qualifier > svg { width: 29px; height: 29px; color: #b97b21; stroke-width: 1.7; }
+.offer-qualifier p { font-size: 13px; line-height: 1.5; color: #494a40; }
+.offer-qualifier strong { font-weight: 700; }
+.sunrise-actions { width: max-content; max-width: 100%; gap: 12px; margin-top: 27px; flex-direction: row; align-items: center; }
+.sunrise-primary, .sunrise-secondary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  min-height: 49px;
+  padding: 12px 21px;
+  border-radius: 50px;
+  border: 1px solid #234c35;
+  font-family: var(--serif);
+  font-size: 16px;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background .2s, transform .2s;
+}
+.sunrise-secondary { background: #fff8edb3; color: #234c35; }
+.sunrise-secondary svg { width: 18px; height: 18px; }
+.sunrise-secondary:hover { background: #efe6d5; transform: translateY(-2px); }
+.sunrise-villas { left: 40%; right: auto; height: 84%; width: auto; bottom: 6%; }
+.sunrise-edge {
+  background: linear-gradient(90deg, #fbf3e8 4%, #fbf3e8e6 30%, #fbf3e800 50%),
+    linear-gradient(0deg, #fbf3e8 0%, #fbf3e800 18%);
+}
+
+@media (min-width: 1700px) {
+  .sunrise-hero { min-height: 870px; }
+  .sunrise-content { padding-top: 38px; }
+  .sunrise-copy { width: 550px; }
+  .sunrise-content h1 { font-size: 76px; }
+  .sunrise-offer { width: 370px; }
+  .sunrise-villas { left: 43%; height: 86%; }
+}
+@media (max-width: 1150px) {
+  .sunrise-content { padding-top: 28px; }
+  .sunrise-copy { max-width: 47%; }
+  .sunrise-content h1 { font-size: clamp(46px, 5.3vw, 60px); }
+  .sunrise-description { font-size: 18px; }
+  .sunrise-offer { width: 335px; padding: 21px 24px; margin-top: 25px; }
+  .offer-price { font-size: 50px; }
+  .sunrise-actions { flex-wrap: wrap; gap: 11px; margin-top: 24px; }
+  .sunrise-primary, .sunrise-secondary { font-size: 15px; padding-inline: 18px; gap: 14px; }
+  .sunrise-villas { left: 43%; height: 78%; }
+}
+@media (min-width: 601px) and (max-width: 800px) {
+  .sunrise-hero { min-height: 850px; }
+  .sunrise-copy { max-width: 49%; }
+  .sunrise-content h1 { font-size: clamp(36px, 5.7vw, 45px); letter-spacing: -1.8px; }
+  .sunrise-eyebrow { font-size: 6px; letter-spacing: .8px; gap: 8px; }
+  .sunrise-eyebrow > span { width: 15px; }
+  .sunrise-description { font-size: 16px; }
+  .sunrise-offer { padding: 21px 20px; }
+  .offer-price { font-size: 46px; }
+  .offer-regular { font-size: 14px; }
+  .offer-qualifier { gap: 11px; }
+  .offer-qualifier > svg { width: 25px; height: 25px; }
+  .offer-qualifier p { font-size: 11px; }
+  .sunrise-actions { flex-direction: column; align-items: stretch; width: 100%; }
+  .sunrise-primary, .sunrise-secondary { justify-content: space-between; font-size: 16px; }
+  .sunrise-villas { left: 48%; height: 72%; bottom: 8%; }
+  .sunrise-edge { background: linear-gradient(90deg, #fbf3e8 4%, #fbf3e8e6 40%, #fbf3e800 62%), linear-gradient(0deg, #fbf3e8, #fbf3e800 18%); }
+}
+@media (max-width: 600px) {
+  .sunrise-hero { height: auto; min-height: 0; max-height: none; }
+  .fallback-sun { width: 90px; }
+  .sunrise-sky { background: radial-gradient(ellipse at 78% 55%, #f8cc8d40, transparent 45%), #fbf3e8; }
+  .sunrise-content { padding-top: 23px; padding-bottom: 480px; }
+  .sunrise-copy { width: 100%; max-width: 100%; }
+  .sunrise-eyebrow { font-size: 7px; margin-bottom: 19px; letter-spacing: 1px; }
+  .sunrise-content h1 { font-size: clamp(43px, 10.7vw, 61px); letter-spacing: -1.9px; }
+  .sunrise-content .sunrise-rule { margin: 21px 0 18px; }
+  .sunrise-description { font-size: 17px; line-height: 1.45; }
+  .sunrise-description br { display: initial; }
+  .sunrise-offer { width: 355px; margin-top: 25px; padding: 22px 24px; }
+  .offer-price { font-size: 51px; }
+  .offer-regular { font-size: 16px; }
+  .offer-qualifier p { font-size: 13px; }
+  .sunrise-actions { display: flex; flex-wrap: wrap; flex-direction: row; width: 100%; gap: 10px; margin-top: 24px; }
+  .sunrise-primary, .sunrise-secondary { flex: 1; min-height: 49px; font-size: 14px; padding: 12px 15px; gap: 10px; }
+  .sunrise-primary svg, .sunrise-secondary svg { width: 15px; height: 15px; }
+  .sunrise-villas { left: auto; right: calc(min(151vw, 640px) * -.325); width: 151%; max-width: 640px; height: auto; bottom: 65px; }
+  .sunrise-orbits { top: auto; bottom: 175px; }
+  .sunrise-edge { background: linear-gradient(90deg, #fbf3e899, transparent 17%), linear-gradient(0deg, #fbf3e8, #fbf3e800 16%); }
+}
+@media (max-width: 380px) {
+  .sunrise-eyebrow { font-size: 6px; }
+  .sunrise-content h1 { font-size: 40px; }
+  .sunrise-offer { padding: 20px; }
+  .offer-price { font-size: 48px; }
+  .offer-qualifier p { font-size: 12px; }
+  .sunrise-primary, .sunrise-secondary { font-size: 13px; padding-inline: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sunrise-secondary:hover { transform: none; }
+}

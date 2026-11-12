@@ -1,0 +1,10 @@
+Asset: public/assets/villa-sunrise-cleanplate.png
+Mode: built-in image_gen, transparent_background=true
+Edit target: public/assets/villa-sunrise.png
+Source generated image: C:/Users/manoj/.codex/generated_images/01a1d0e1-be24-7243-ae8b-8d4d50766455/exec-92797e90-21d8-4b3c-af18-875e737698b3.png
+
+Final prompt:
+Use case: precise-object-edit. Asset type: clean background plate for a layered animation, NOT a redesign. Input image is the edit target. Keep the EXACT 1536x1024 framing, pixel positions, scale, camera, ivory villa architecture, railings, windows, parked red Mini and black sedan, sidewalk, planter boxes, road, light and shadows. Remove ALL outdoor plants, all green balcony planting rows, all four flowering ornamental street trees including canopies and stems, ground-level greenery in planter boxes, and the large foliage at the far left. Seamlessly reconstruct the stationary building surfaces and windows previously obscured by plants. Leave planter boxes as empty planter boxes with soil. Remove leaf-shaped shadows where feasible. Do not remove trees reflected in glass unless needed; do not change any other details. Preserve existing fully transparent sky and outside edges: background must remain truly transparent. Do not add any new objects, buildings or sky. Output at same landscape 3:2 aspect ratio, identical full composition and alignment.
+
+Validated: 1536 x 1024 RGBA; alpha=0 in the sky.
+Integration: Original image remains the visual master. Only plant-removal mask pixels reveal this reconstructed backing. The animated planting samples the original image.

@@ -1,0 +1,9 @@
+Asset: public/assets/villa-sunrise.png
+Mode: built-in image_gen, transparent_background=true
+Reference: C:/Users/manoj/Downloads/ChatGPT Image Nov 12, 2026, 11_17_26 PM.png
+Source generated image: C:/Users/manoj/.codex/generated_images/01a1d0e1-be24-7243-ae8b-8d4d50766455/exec-a7d5ec28-23d4-4c7a-8419-efe4cc3d08d9.png
+
+Final prompt:
+Use case: background-extraction. Asset type: transparent architectural foreground layer for an animated HTML website. Input image is reference and edit target. Extract/recreate ONLY the main hero's row of three cream luxury villas, the small ornamental trees and planted balconies, parked cars, and narrow paved street from the attached design. Keep the villa architecture extremely faithful: warm ivory rounded facade, bronze windows, rounded first floor balconies, rooftop railings, one main large villa on left and two receding to right. Three-quarter front view like reference. Isolate the buildings, small trees, sidewalk and small strip of road on a TRUE transparent background. Entire sky must be transparent, no sun, no clouds, no rays. REMOVE ALL text, logos, UI, buttons, price panel, decorative curves and lower second-section photo, and the corner foreground leaves. Compose as a single wide landscape architectural cutout, roughly 3:2. Buildings fill width, main villa entire height visible including roof and street. Elegant realistic premium architectural photography/render, warm soft morning illumination. No backdrop, no checkerboard painted in, true alpha. The top outline of roofs and trees must be carefully cut out; retain window/rail details.
+
+Validated: 1536 x 1024 RGBA; alpha=0 in the sky; the project copy is served locally.

@@ -1,0 +1,7 @@
+Built-in image_gen tool: matched cleanplate edit.
+Input: public/assets/morning-terrace-v2.png
+Output: public/assets/morning-terrace-v2-cleanplate.png
+
+Use case: precise-object-edit. This is a matched clean background plate for a wind animation, not a new artistic variation. Edit the supplied 2172x724 panoramic villa terrace image.
+Remove ONLY the two close foreground plant/flower clusters growing out of the cream balcony planter trough: left cluster around x14–39%,y52–76% and right cluster x68–98%,y55–80%. Remove their leaves, stems and flowers completely, exposing the exact continuous bronze railing, distant landscape, and empty soil/inner trough that would be behind them. The glass reflection/shadow of plants farleft and cast foliage shadows can remain; only those two close planter clusters are to be removed. Do NOT remove, change or simplify any distant forest, road or landscape.
+Everything else must be pixel-aligned with the input: same 2172x724 canvas and3:1 crop, identical camera, cream curved ceiling/parapet, wooden wall, slidingdoor, curtains, coffeecup, saucer, table, napkin, sofa, landscape, lighting, sky, railing and shadows. Reconstruct railing bars accurately where they were occluded. No new objects, no foliage left in the two planterbeds, no sun, no wheel, no text. Keep naturally empty creamplanters and unobtrusive soil; avoid broadwhitepatchesoutsideplanters.

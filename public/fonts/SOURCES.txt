@@ -1,0 +1,20 @@
+ELARA local web fonts
+
+Cormorant Garamond variable roman and italic
+Source: https://github.com/google/fonts/tree/main/ofl/cormorantgaramond
+Files: cormorant-garamond-latin.woff2, cormorant-garamond-latin-ext.woff2,
+       cormorant-garamond-italic-latin.woff2
+License: OFL-cormorant-garamond.txt
+
+Manrope variable
+Source: https://github.com/google/fonts/tree/main/ofl/manrope
+Files: manrope-latin.woff2, manrope-latin-ext.woff2
+License: OFL-manrope.txt
+
+Official WOFF2 subsets downloaded via fonts.googleapis.com / fonts.gstatic.com
+on 2026-11-13. Latin-extended subsets include the Indian rupee glyph (U+20B9).
+These font files are served locally. No third-party font requests are made by
+visitors to the site.
+
+CSS endpoint:
+https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Manrope:wght@200..800&display=swap
