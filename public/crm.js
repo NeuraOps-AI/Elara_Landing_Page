@@ -302,7 +302,7 @@ async function loadLeads() {
   } catch (error) {
     if (redirecting || version !== authVersion) return;
     byId('updated').textContent = 'Connection unavailable';
-    makeState('Your workspace needs a moment.', 'We couldn’t load your enquiries. Check that the local server is running and try again.', { actionText: 'Try again', action: loadLeads, error: true });
+    makeState('Your workspace needs a moment.', 'We couldn’t load your enquiries. Check your connection and try again.', { actionText: 'Try again', action: loadLeads, error: true });
     byId('announcer').textContent = 'Could not load leads. Try refreshing.';
   } finally {
     if (version === authVersion) {

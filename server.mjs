@@ -1,10 +1,11 @@
 import http from 'node:http';
 import { createReadStream } from 'node:fs';
-import { mkdir, readFile, writeFile, rename, stat } from 'node:fs/promises';
+import { readFile, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, randomUUID, createHash, timingSafeEqual } from 'node:crypto';
 import { createCrmAuth } from './crm-auth.mjs';
+import { createFileStore } from './storage.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const BODY_LIMIT = 32 * 1024;
@@ -88,10 +89,14 @@ function validateEnquiry(input) {
   return { name, email, phone, interest, message, source, requestedDocuments: document === 'both' ? ['brochure', 'price-sheet'] : [document] };
 }
 
-function checkLocalRequest(req) {
+function checkRequest(req, siteOrigin) {
   const host = req.headers.host || '';
-  if (!/^(localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5})?$/i.test(host)) throw error(403, 'This application is available on localhost only.');
-  if (req.headers.origin && req.headers.origin !== `http://${host}`) throw error(403, 'Please submit this request from the ELARA website.');
+  if (siteOrigin) {
+    if (host !== new URL(siteOrigin).host) throw error(403, 'Please use the ELARA website address.');
+  } else if (!/^(localhost|127\.0\.0\.1|\[::1\])(?::\d{1,5})?$/i.test(host)) {
+    throw error(403, 'This application is available on localhost only.');
+  }
+  if (req.headers.origin && req.headers.origin !== (siteOrigin || `http://${host}`)) throw error(403, 'Please submit this request from the ELARA website.');
   if (['cross-site', 'same-site'].includes(req.headers['sec-fetch-site'])) throw error(403, 'Please open the ELARA website directly.');
 }
 
@@ -191,44 +196,30 @@ async function streamFile(req, res, filename, type, headers = {}) {
   stream.pipe(res);
 }
 
-/** Creates a loopback-oriented app. The caller controls the listening port. */
-export async function createElaraServer({
+/** Shared request handler for the local server and Netlify Functions. */
+export async function createElaraHandler({
   publicDir = path.join(ROOT, 'public'), dataDir = path.join(ROOT, 'data'), documentsDir = path.join(ROOT, 'private'),
   crmPassword = process.env.CRM_PASSWORD, authNow = Date.now,
+  databaseStore, authStore, siteOrigin, storageName = 'local',
 } = {}) {
-  const dataFile = path.join(dataDir, 'leads.json');
-  await mkdir(dataDir, { recursive: true });
-  const crmAuth = await createCrmAuth({ password: crmPassword, credentialFile: path.join(dataDir, 'crm-auth.json'), now: authNow });
-  let database = { version: 1, leads: [], grants: [] };
-  try {
-    const saved = JSON.parse(await readFile(dataFile, 'utf8'));
-    if (saved.version !== 1 || !Array.isArray(saved.leads) || !Array.isArray(saved.grants)) throw new Error('Unsupported leads database format.');
-    database = saved;
-  } catch (cause) {
-    if (cause.code !== 'ENOENT') throw new Error(`Cannot read the leads database. Existing data has been preserved: ${cause.message}`);
-  }
-  let writes = Promise.resolve();
-  function transaction(change) {
-    const operation = writes.then(async () => {
-      const next = structuredClone(database);
-      const result = change(next);
-      await writeFile(`${dataFile}.tmp`, JSON.stringify(next, null, 2), { mode: 0o600 });
-      await rename(`${dataFile}.tmp`, dataFile);
-      database = next;
-      return result;
-    });
-    writes = operation.catch(() => {});
-    return operation;
-  }
+  const store = databaseStore || await createFileStore(path.join(dataDir, 'leads.json'), { version: 1, leads: [], grants: [] }, {
+    validate(saved) {
+      if (saved?.version !== 1 || !Array.isArray(saved.leads) || !Array.isArray(saved.grants)) throw new Error('Unsupported leads database format.');
+    },
+  });
+  const crmAuth = await createCrmAuth({
+    password: crmPassword, credentialFile: dataDir ? path.join(dataDir, 'crm-auth.json') : null,
+    now: authNow, stateStore: authStore, secureCookies: siteOrigin?.startsWith('https://'),
+  });
 
-  return http.createServer(async (req, res) => {
+  return async (req, res) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'same-origin');
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
     try {
-      checkLocalRequest(req);
-      const url = new URL(req.url, `http://${req.headers.host}`);
+      checkRequest(req, siteOrigin);
+      const url = new URL(req.url, siteOrigin || `http://${req.headers.host}`);
       const pathname = decodeURIComponent(url.pathname);
       const method = req.method;
 
@@ -238,13 +229,13 @@ export async function createElaraServer({
         sendJson(res, 200, { ok: true }); return;
       }
       if (pathname === '/api/crm/session' && method === 'GET') {
-        sendJson(res, 200, crmAuth.sessionInfo(req)); return;
+        sendJson(res, 200, await crmAuth.sessionInfo(req)); return;
       }
       if (pathname === '/api/crm/logout' && method === 'POST') {
-        res.setHeader('Set-Cookie', crmAuth.logout(req));
+        res.setHeader('Set-Cookie', await crmAuth.logout(req));
         sendJson(res, 200, { ok: true }); return;
       }
-      if (pathname === '/api/leads' || pathname.startsWith('/api/leads/')) crmAuth.require(req);
+      if (pathname === '/api/leads' || pathname.startsWith('/api/leads/')) await crmAuth.require(req);
 
       if (/^\/CRM\/112026\/?$/i.test(pathname) && ['GET', 'HEAD'].includes(method)) {
         res.setHeader('Cache-Control', 'private, no-store');
@@ -252,18 +243,18 @@ export async function createElaraServer({
         if (pathname !== '/CRM/112026') {
           res.writeHead(308, { Location: '/CRM/112026' }); res.end(); return;
         }
-        const page = crmAuth.authenticated(req) ? 'crm.html' : 'crm-login.html';
+        const page = await crmAuth.authenticated(req) ? 'crm.html' : 'crm-login.html';
         await streamFile(req, res, path.join(publicDir, page), TYPES['.html'], { 'Cache-Control': 'private, no-store' });
         return;
       }
 
       if (pathname === '/api/health' && method === 'GET') {
-        sendJson(res, 200, { ok: true, app: 'ELARA', storage: 'local', statuses: STATUSES }); return;
+        sendJson(res, 200, { ok: true, app: 'ELARA', storage: storageName, statuses: STATUSES }); return;
       }
 
       if (pathname === '/api/enquiries' && method === 'POST') {
         const enquiry = validateEnquiry(await readJson(req));
-        const result = await transaction(db => {
+        const result = await store.transaction(db => {
           const createdAt = new Date().toISOString();
           const lead = { id: randomUUID(), ...enquiry, createdAt, updatedAt: createdAt, status: 'New', notes: '', consent: true };
           db.leads.push(lead);
@@ -286,6 +277,7 @@ export async function createElaraServer({
         const token = url.searchParams.get('token') || '';
         if (!/^[A-Za-z0-9_-]{43}$/.test(token)) throw error(403, 'Please complete the enquiry form to unlock this download.');
         const hash = Buffer.from(tokenHash(token), 'hex');
+        const database = await store.read();
         const grant = database.grants.find(item => item.document === document && Date.parse(item.expiresAt) > Date.now() && timingSafeEqual(Buffer.from(item.tokenHash, 'hex'), hash));
         if (!grant) throw error(403, 'This download link has expired. Please complete the enquiry form again.');
         if (document === 'both') {
@@ -312,12 +304,12 @@ export async function createElaraServer({
       }
 
       if (pathname === '/api/leads' && method === 'GET') {
-        await writes;
+        const database = await store.read();
         sendJson(res, 200, { leads: [...database.leads].sort((a, b) => b.createdAt.localeCompare(a.createdAt)) }); return;
       }
 
       if (pathname === '/api/leads/export' && method === 'GET') {
-        await writes;
+        const database = await store.read();
         const columns = ['Name', 'Email', 'Phone', 'Interest', 'Status', 'Source', 'Requested documents', 'Message', 'Notes', 'Created at', 'Updated at'];
         const rows = database.leads.map(lead => [lead.name, lead.email, lead.phone, lead.interest, lead.status, lead.source, lead.requestedDocuments.join(', '), lead.message, lead.notes, lead.createdAt, lead.updatedAt]);
         res.writeHead(200, { 'Content-Type': 'text/csv; charset=utf-8', 'Content-Disposition': 'attachment; filename="ELARA-Leads.csv"', 'Cache-Control': 'no-store' });
@@ -330,7 +322,7 @@ export async function createElaraServer({
         if (input.status !== undefined && !STATUSES.includes(input.status)) throw error(422, 'Select a valid lead status.');
         if (input.notes !== undefined && (typeof input.notes !== 'string' || input.notes.length > 10000)) throw error(422, 'Keep notes below 10,000 characters.');
         if (input.status === undefined && input.notes === undefined) throw error(422, 'Provide a status or notes to update.');
-        const lead = await transaction(db => {
+        const lead = await store.transaction(db => {
           const found = db.leads.find(item => item.id === leadMatch[1]);
           if (!found) throw error(404, 'This lead was not found.');
           if (input.status !== undefined) found.status = input.status;
@@ -375,7 +367,12 @@ export async function createElaraServer({
         sendJson(res, 500, { error: 'Something went wrong. Please try again.' });
       }
     }
-  });
+  };
+}
+
+/** Local development remains bound to loopback by the command below. */
+export async function createElaraServer(options) {
+  return http.createServer(await createElaraHandler(options));
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

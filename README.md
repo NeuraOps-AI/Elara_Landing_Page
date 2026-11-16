@@ -1,12 +1,13 @@
-# ELARA local website and leads CRM
+# ELARA website and leads CRM
 
-A responsive property website using the supplied ELARA and Grupe Nayan branding, villa renders, location map and project film. No package installation is needed.
+A responsive property website using the supplied ELARA and Grupe Nayan branding, villa renders, location map and project film. It runs locally with Node.js or on Netlify with Functions and Blobs.
 
 ## Start
 
-Requires Node.js 20 or newer. In this folder run:
+Requires Node.js 22.12 or newer. In this folder run:
 
 ```powershell
+npm ci
 npm start
 ```
 
@@ -35,7 +36,28 @@ Sign-in creates an opaque HttpOnly, SameSite=Strict session cookie lasting eight
 
 Leads, notes and hashed download grants persist in `data/leads.json`. Back up this file before replacing or moving the project. It contains personal enquiry information and is excluded from Git. Test data is isolated from this file.
 
-This is a local development application. It binds only to `127.0.0.1` and uses a shared CRM password. Before a public deployment, configure HTTPS, individual staff access, production storage and a reviewed privacy policy.
+The local server binds only to `127.0.0.1`. The Netlify deployment uses the same protected routes over HTTPS, with shared server-side sessions and durable lead storage as described below.
+
+## Netlify deployment
+
+The CRM is a server-rendered route, not a static HTML URL. Publishing only `public/` causes Netlify to return 404 for `/CRM/112026` and leaves the API unavailable. The checked-in `netlify.toml` builds `dist/` and deploys `netlify/functions/elara.mjs`; do not override the publish directory back to `public` or add an SPA rewrite to `index.html`.
+
+1. Connect the repository and select the branch to deploy. To preview the `dev` fix, enable a branch deploy for `dev` in Netlify.
+2. Add `CRM_PASSWORD` in **Netlify → Project configuration → Environment variables**, with the chosen password (12–256 characters). Include the **Functions** scope when scope selection is available, and set the appropriate production/branch deploy context. Do not put this password in `netlify.toml`, source code or a client-side variable.
+3. Deploy again after setting or changing the variable. Netlify reads `npm run build`, publish directory `dist`, and the function directory from this repository. The local `data/crm-auth.json` is deliberately not uploaded, so hosted sign-in will stay unavailable until the environment variable is set.
+4. Open `/CRM/112026` on that deployment. It should show sign-in, require the password, and keep `/api/leads` locked without a session. Unknown page URLs redirect to `/`.
+
+Netlify Blobs automatically supplies storage credentials inside the function. The `elara-crm` site store retains production leads, notes and download grants across deploys. Strong reads and conditional writes prevent concurrent requests from silently replacing each other's changes. Branch/preview URLs have separate data namespaces and cannot view production leads. Previous, unpublished production deploys return 410 instead of accessing current production data.
+
+Hosted sessions and sign-in limits are also stored server-side, so cold starts do not sign users out or reset password-attempt limits. Cookies use Secure, HttpOnly and SameSite=Strict. Each new deployment starts a fresh session namespace; redeploying after a password change revokes old sessions. Local `data/leads.json` and local credentials remain local and are not migrated by a Git push.
+
+CRM HTML and private PDFs are included only in the function bundle, never in `dist/`. CSS, scripts, fonts, images and the landing page are served by Netlify's CDN. The backend retains the existing enquiry, download, ZIP, CSV and lead-update endpoints.
+
+To check the static build locally, run `npm run build`. For the complete Netlify function bundle check, run `npx netlify-cli build --offline`. Verify the deployed CRM sign-in, an enquiry/download, sign-out, and a wrong page URL after deployment.
+
+To run the Netlify router locally in PowerShell, set `$env:NETLIFY_DEV='true'` and then run `npx netlify-cli serve --offline`. Supply a separate test password through `CRM_PASSWORD`. With this development flag and a loopback origin, the app uses isolated files in ignored `.netlify/elara-dev/`: the current Blobs emulator omits the ETags required for conditional reads/updates. Hosted deployments always use Blobs and fail closed if a record has no version; they never silently fall back to local files. This local mode checks routing and authentication; the conditional-write tests cover cross-instance concurrency separately.
+
+Reference: [Netlify Functions routing](https://docs.netlify.com/build/functions/configuration/), [runtime environment variables](https://docs.netlify.com/build/functions/environment-variables/) and [Netlify Blobs](https://docs.netlify.com/build/data-and-storage/netlify-blobs/).
 
 ## Files to edit
 
@@ -65,9 +87,13 @@ This is a local development application. It binds only to `127.0.0.1` and uses a
 - `public/assets/`: extracted logos and optimized supplied media
 - `private/`: gated brochure and price sheet
 - `server.mjs`: local HTTP server, validation, persistence and downloads
+- `storage.mjs`: atomic local files and conditional Netlify Blobs transactions
+- `netlify-app.mjs`: adapter for the shared application routes
+- `netlify/functions/elara.mjs`, `netlify.toml`: hosted routing, deployment and storage configuration
+- `scripts/build-netlify.mjs`: static build excluding protected HTML and documents
 - `scripts/prepare_assets.py`: reproducible asset and brochure preparation
 
-The asset script uses Pillow, pypdf, reportlab and Poppler. These are only required when rebuilding assets; the website itself uses Node.js standard libraries.
+The asset script uses Pillow, pypdf, reportlab and Poppler. These are only required when rebuilding assets. Hosted execution uses the dependencies pinned in `package-lock.json`.
 
 ## Verify
 
@@ -75,9 +101,9 @@ The asset script uses Pillow, pypdf, reportlab and Poppler. These are only requi
 npm test
 ```
 
-Tests use temporary fixture data and cover enquiry validation, persistence, protected downloads, ZIP structure, authenticated CRM updates, CSV escaping, origin checks, private path protection, password verification, session expiry/logout and sign-in limits.
+Tests use temporary fixture data and cover enquiry validation, persistence, protected downloads, ZIP structure, authenticated CRM updates, CSV escaping, origin checks, private path protection, password verification, session expiry/logout and sign-in limits. Netlify tests also cover independent function instances, concurrent conditional writes, deployment/preview isolation and request size limits.
 
-All source material in the project root is retained unchanged. No site has been published.
+All source material in the project root is retained unchanged. Pushing code does not configure Netlify secrets or migrate local lead records.
 
 ## Animated morning scene
 

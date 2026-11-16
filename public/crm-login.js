@@ -49,7 +49,7 @@ loginForm.addEventListener('submit', async event => {
     concealPassword();
     window.location.replace('/CRM/112026');
   } catch (cause) {
-    loginError.textContent = cause instanceof TypeError ? 'Couldn’t connect. Check that the application is running and try again.' : cause.message;
+    loginError.textContent = cause instanceof TypeError ? 'Couldn’t connect. Check your connection and try again.' : cause.message;
     loginError.hidden = false;
     passwordField.value = '';
     concealPassword();

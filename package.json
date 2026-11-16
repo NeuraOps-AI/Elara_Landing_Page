@@ -8,7 +8,14 @@
     "start": "node server.mjs",
     "dev": "node --watch server.mjs",
     "test": "node --test",
-    "crm:password": "node scripts/set-crm-password.mjs"
+    "crm:password": "node scripts/set-crm-password.mjs",
+    "build": "node scripts/build-netlify.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^11.1.9",
+    "serverless-http": "^4.0.0"
+  }
 }
