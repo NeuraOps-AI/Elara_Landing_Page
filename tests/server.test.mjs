@@ -14,13 +14,14 @@ const validEnquiry = {
 
 test('enquiry capture, gated files, durable CRM and local request protections', async t => {
   const directory = await mkdtemp(path.join(os.tmpdir(), 'elara-server-test-'));
-  const config = { publicDir: path.join(directory, 'public'), dataDir: path.join(directory, 'data'), documentsDir: path.join(directory, 'private') };
+  const config = { publicDir: path.join(directory, 'public'), dataDir: path.join(directory, 'data'), documentsDir: path.join(directory, 'private'), crmPassword: 'Only-For-Tests!42' };
   await Promise.all([mkdir(config.publicDir), mkdir(config.documentsDir)]);
   const brochure = Buffer.from('%PDF-1.4\nTest brochure fixture\n%%EOF');
   const priceSheet = Buffer.from('%PDF-1.4\nTest price sheet fixture\n%%EOF');
   await Promise.all([
     writeFile(path.join(config.publicDir, 'index.html'), '<h1>ELARA</h1>'),
     writeFile(path.join(config.publicDir, 'crm.html'), '<h1>Leads</h1>'),
+    writeFile(path.join(config.publicDir, 'crm-login.html'), '<h1>CRM sign in</h1>'),
     writeFile(path.join(config.documentsDir, 'ELARA-Brochure.pdf'), brochure),
     writeFile(path.join(config.documentsDir, 'ELARA-Price-Sheet.pdf'), priceSheet),
   ]);
@@ -33,13 +34,22 @@ test('enquiry capture, gated files, durable CRM and local request protections', 
   async function close() { server.closeAllConnections(); await new Promise(resolve => server.close(resolve)); }
   t.after(async () => { await close(); await rm(directory, { recursive: true, force: true }); });
   const post = (body, headers = {}) => fetch(`${base}/api/enquiries`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...headers }, body: JSON.stringify(body) });
+  let sessionCookie;
+  async function signIn() {
+    const response = await fetch(`${base}/api/crm/login`, { method: 'POST', headers: { 'Content-Type': 'application/json', Origin: base }, body: JSON.stringify({ password: config.crmPassword }) });
+    assert.equal(response.status, 200);
+    sessionCookie = response.headers.get('set-cookie').split(';')[0];
+  }
+  const crmFetch = (url, options = {}) => fetch(url, { ...options, headers: { ...options.headers, Cookie: sessionCookie } });
   let created;
 
   await t.test('serves website and CRM and starts with zero leads', async () => {
     assert.match(await (await fetch(base)).text(), /ELARA/);
-    assert.match(await (await fetch(`${base}/crm`)).text(), /Leads/);
+    assert.match(await (await fetch(`${base}/CRM/112026`)).text(), /CRM sign in/);
+    await signIn();
+    assert.match(await (await crmFetch(`${base}/CRM/112026`)).text(), /Leads/);
     assert.equal((await (await fetch(`${base}/api/health`)).json()).ok, true);
-    assert.deepEqual((await (await fetch(`${base}/api/leads`)).json()).leads, []);
+    assert.deepEqual((await (await crmFetch(`${base}/api/leads`)).json()).leads, []);
   });
 
   await t.test('rejects incomplete or oversized forms without creating records', async () => {
@@ -49,7 +59,7 @@ test('enquiry capture, gated files, durable CRM and local request protections', 
     assert.ok(fields.email && fields.phone && fields.consent);
     assert.equal((await post({ ...validEnquiry, message: 'x'.repeat(33000) })).status, 413);
     assert.equal((await fetch(`${base}/api/enquiries`, { method: 'POST', body: 'hello' })).status, 415);
-    assert.deepEqual((await (await fetch(`${base}/api/leads`)).json()).leads, []);
+    assert.deepEqual((await (await crmFetch(`${base}/api/leads`)).json()).leads, []);
   });
 
   await t.test('rejects cross-origin requests and foreign Host headers', async () => {
@@ -118,12 +128,12 @@ test('enquiry capture, gated files, durable CRM and local request protections', 
 
   await t.test('updates status and notes, blocks invalid statuses and escapes CSV formula cells', async () => {
     const endpoint = `${base}/api/leads/${created.lead.id}`;
-    const update = await fetch(endpoint, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Contacted', notes: '=HYPERLINK("unsafe")' }) });
+    const update = await crmFetch(endpoint, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'Contacted', notes: '=HYPERLINK("unsafe")' }) });
     assert.equal(update.status, 200);
     assert.equal((await update.json()).lead.status, 'Contacted');
-    const invalid = await fetch(endpoint, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'INVALID' }) });
+    const invalid = await crmFetch(endpoint, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ status: 'INVALID' }) });
     assert.equal(invalid.status, 422);
-    const response = await fetch(`${base}/api/leads/export`);
+    const response = await crmFetch(`${base}/api/leads/export`);
     assert.equal(response.status, 200);
     const csv = await response.text();
     assert.match(csv, /Test Visitor/);
@@ -134,7 +144,7 @@ test('enquiry capture, gated files, durable CRM and local request protections', 
   await t.test('serializes concurrent writes without losing enquiries', async () => {
     const responses = await Promise.all(Array.from({ length: 5 }, (_, index) => post({ ...validEnquiry, name: `Concurrent Visitor ${index}`, document: 'brochure' })));
     assert.ok(responses.every(response => response.status === 201));
-    assert.equal((await (await fetch(`${base}/api/leads`)).json()).leads.length, 6);
+    assert.equal((await (await crmFetch(`${base}/api/leads`)).json()).leads.length, 6);
     assert.equal(JSON.parse(await readFile(path.join(config.dataDir, 'leads.json'), 'utf8')).leads.length, 6);
   });
 
@@ -142,7 +152,8 @@ test('enquiry capture, gated files, durable CRM and local request protections', 
     await close();
     server = await createElaraServer(config);
     base = await listen();
-    const records = (await (await fetch(`${base}/api/leads`)).json()).leads;
+    await signIn();
+    const records = (await (await crmFetch(`${base}/api/leads`)).json()).leads;
     assert.equal(records.length, 6);
     const lead = records.find(item => item.id === created.lead.id);
     assert.equal(lead.status, 'Contacted');

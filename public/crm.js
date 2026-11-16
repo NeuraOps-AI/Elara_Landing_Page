@@ -8,6 +8,145 @@ let leads = [];
 let selectedLead = null;
 let loading = false;
 let opener = null;
+let sessionActive = false;
+let checkingSession = false;
+let checkAgain = false;
+let signingOut = false;
+let redirecting = false;
+let authVersion = 0;
+let sessionExpiryTimer;
+const CRM_PATH = '/CRM/112026';
+
+function clearWorkspace() {
+  clearTimeout(sessionExpiryTimer);
+  authVersion++;
+  sessionActive = false;
+  loading = false;
+  leads = [];
+  selectedLead = null;
+  opener = null;
+  const dialog = byId('lead-dialog');
+  if (dialog.open) dialog.close();
+  byId('leads-body').replaceChildren();
+  byId('stats').replaceChildren();
+  ['nav-count', 'results-count'].forEach(id => { byId(id).textContent = '0'; });
+  ['detail-name', 'detail-avatar', 'detail-created', 'detail-interest', 'detail-documents', 'detail-source', 'detail-message', 'save-feedback', 'table-summary', 'announcer'].forEach(id => { byId(id).textContent = ''; });
+  ['detail-phone', 'detail-email'].forEach(id => {
+    byId(id).removeAttribute('href');
+    byId(id).querySelector('span').textContent = '';
+  });
+  byId('detail-notes').value = '';
+  byId('search').value = '';
+  byId('detail-status').value = 'New';
+  byId('table-scroll').hidden = true;
+  byId('refresh').disabled = true;
+  byId('export-leads').disabled = true;
+}
+
+function signInAgain() {
+  if (redirecting) return;
+  redirecting = true;
+  clearWorkspace();
+  document.body.hidden = true;
+  window.location.replace(CRM_PATH);
+}
+
+async function crmFetch(url, options = {}) {
+  const response = await fetch(url, { ...options, credentials: 'same-origin', cache: 'no-store' });
+  if (response.status === 401) {
+    signInAgain();
+    throw new Error('Sign in to continue.');
+  }
+  return response;
+}
+
+async function verifySession() {
+  if (redirecting || signingOut) return;
+  if (checkingSession) { checkAgain = true; return; }
+  checkingSession = true;
+  const version = authVersion;
+  try {
+    const response = await crmFetch('/api/crm/session', { headers: { Accept: 'application/json' } });
+    if (!response.ok) throw new Error('Could not verify your session.');
+    const result = await response.json();
+    if (version !== authVersion || redirecting) return;
+    if (result.authenticated !== true) { signInAgain(); return; }
+    const expiresAt = typeof result.expiresAt === 'number' ? result.expiresAt : Date.parse(result.expiresAt);
+    if (Number.isFinite(expiresAt)) {
+      if (expiresAt <= Date.now()) { signInAgain(); return; }
+      clearTimeout(sessionExpiryTimer);
+      sessionExpiryTimer = setTimeout(signInAgain, Math.min(expiresAt - Date.now(), 2147483647));
+    }
+    sessionActive = true;
+    byId('session-message').hidden = true;
+    byId('refresh').disabled = false;
+    byId('export-leads').disabled = false;
+    await loadLeads();
+  } catch {
+    if (redirecting || version !== authVersion) return;
+    clearWorkspace();
+    byId('updated').textContent = 'Sign-in check unavailable';
+    makeState('Let’s reconnect your workspace.', 'We couldn’t verify your session. Check the connection and try again.', { actionText: 'Try again', action: verifySession, error: true });
+  } finally {
+    checkingSession = false;
+    if (checkAgain && !redirecting && !signingOut) {
+      checkAgain = false;
+      verifySession();
+    }
+  }
+}
+
+async function signOut() {
+  if (redirecting) return;
+  signingOut = true;
+  const button = byId('logout');
+  button.disabled = true;
+  button.textContent = 'Signing out…';
+  clearWorkspace();
+  byId('session-message').hidden = true;
+  makeState('Signing out', 'Closing your workspace.');
+  try {
+    const response = await fetch('/api/crm/logout', { method: 'POST', credentials: 'same-origin', cache: 'no-store', headers: { Accept: 'application/json' } });
+    if (!response.ok && response.status !== 401) throw new Error();
+    signInAgain();
+  } catch {
+    byId('session-message').textContent = 'We couldn’t complete sign out. Check the connection and select Sign out again.';
+    byId('session-message').hidden = false;
+    makeState('Your leads are hidden.', 'Reconnect to finish signing out.');
+  } finally {
+    if (!redirecting) { button.disabled = false; button.textContent = 'Sign out'; }
+  }
+}
+
+async function exportLeads() {
+  if (!sessionActive || redirecting) return;
+  const version = authVersion;
+  const button = byId('export-leads');
+  button.disabled = true;
+  button.querySelector('span').textContent = 'Preparing export…';
+  byId('session-message').hidden = true;
+  try {
+    const response = await crmFetch('/api/leads/export', { headers: { Accept: 'text/csv' } });
+    if (!response.ok) throw new Error('We couldn’t export your leads. Please try again.');
+    const blob = await response.blob();
+    if (version !== authVersion || redirecting) return;
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'ELARA-Leads.csv';
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000);
+  } catch (cause) {
+    if (redirecting || version !== authVersion) return;
+    byId('session-message').textContent = cause.message || 'We couldn’t export your leads. Please try again.';
+    byId('session-message').hidden = false;
+  } finally {
+    button.querySelector('span').textContent = 'Export all leads';
+    if (sessionActive && version === authVersion) button.disabled = false;
+  }
+}
 
 function element(tag, className, text) {
   const node = document.createElement(tag);
@@ -145,26 +284,31 @@ function render() {
 }
 
 async function loadLeads() {
-  if (loading) return;
+  if (loading || !sessionActive || redirecting) return;
+  const version = authVersion;
   loading = true;
   byId('refresh').disabled = true;
   byId('updated').textContent = 'Refreshing…';
   try {
-    const response = await fetch('/api/leads', { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    const response = await crmFetch('/api/leads', { headers: { Accept: 'application/json' } });
     if (!response.ok) throw new Error('Could not load enquiries.');
     const result = await response.json();
+    if (redirecting || version !== authVersion) return;
     if (!Array.isArray(result.leads)) throw new Error('The lead response was incomplete.');
     leads = result.leads;
     render();
     byId('updated').textContent = `Updated ${formatDate(new Date().toISOString(), { hour: '2-digit', minute: '2-digit' })} IST`;
     byId('announcer').textContent = `${leads.length} ${leads.length === 1 ? 'lead' : 'leads'} loaded.`;
   } catch (error) {
+    if (redirecting || version !== authVersion) return;
     byId('updated').textContent = 'Connection unavailable';
     makeState('Your workspace needs a moment.', 'We couldn’t load your enquiries. Check that the local server is running and try again.', { actionText: 'Try again', action: loadLeads, error: true });
     byId('announcer').textContent = 'Could not load leads. Try refreshing.';
   } finally {
-    loading = false;
-    byId('refresh').disabled = false;
+    if (version === authVersion) {
+      loading = false;
+      byId('refresh').disabled = !sessionActive;
+    }
   }
 }
 
@@ -200,7 +344,8 @@ function closeLead() {
 
 async function saveLead(event) {
   event.preventDefault();
-  if (!selectedLead) return;
+  if (!selectedLead || !sessionActive || redirecting) return;
+  const version = authVersion;
   const id = selectedLead.id;
   const button = byId('save-lead');
   const feedback = byId('save-feedback');
@@ -208,12 +353,13 @@ async function saveLead(event) {
   feedback.textContent = 'Saving…';
   feedback.classList.remove('error');
   try {
-    const response = await fetch(`/api/leads/${encodeURIComponent(id)}`, {
+    const response = await crmFetch(`/api/leads/${encodeURIComponent(id)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ status: byId('detail-status').value, notes: byId('detail-notes').value })
     });
     const result = await response.json();
+    if (redirecting || version !== authVersion) return;
     if (!response.ok || !result.lead) throw new Error(result.error || 'We couldn’t save these changes. Please try again.');
     leads = leads.map(lead => lead.id === id ? result.lead : lead);
     if (selectedLead?.id === id) {
@@ -223,16 +369,19 @@ async function saveLead(event) {
     render();
     byId('announcer').textContent = 'Lead changes saved.';
   } catch (error) {
+    if (redirecting || version !== authVersion) return;
     feedback.textContent = error.message || 'We couldn’t save these changes. Please try again.';
     feedback.classList.add('error');
   } finally {
-    button.disabled = false;
+    if (sessionActive && version === authVersion) button.disabled = false;
   }
 }
 
 byId('search').addEventListener('input', render);
 ['status-filter', 'document-filter', 'sort'].forEach(id => byId(id).addEventListener('change', render));
 byId('refresh').addEventListener('click', loadLeads);
+byId('logout').addEventListener('click', signOut);
+byId('export-leads').addEventListener('click', exportLeads);
 byId('close-dialog').addEventListener('click', closeLead);
 byId('lead-form').addEventListener('submit', saveLead);
 byId('lead-dialog').addEventListener('click', event => {
@@ -247,5 +396,21 @@ byId('lead-dialog').addEventListener('close', () => {
   else byId('refresh').focus();
 });
 
-buildStats();
-loadLeads();
+// Never restore a cached lead table after signing out in another page or tab.
+window.addEventListener('pagehide', () => {
+  clearWorkspace();
+  document.body.hidden = true;
+});
+window.addEventListener('pageshow', event => {
+  if (event.persisted) window.location.reload();
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && !redirecting && !signingOut) {
+    clearWorkspace();
+    makeState('Checking your sign-in', 'Your workspace will be ready in a moment.');
+    verifySession();
+  }
+});
+
+clearWorkspace();
+verifySession();

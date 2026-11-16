@@ -6,15 +6,16 @@
   <meta name="theme-color" content="#36564a">
   <title>Leads · ELARA</title>
   <meta name="description" content="ELARA's local enquiry and leads workspace.">
-  <link rel="stylesheet" href="/crm.css?v=2">
-  <script src="/crm.js?v=2" defer></script>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="/crm.css?v=3">
+  <script src="/crm.js?v=3" defer></script>
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to leads</a>
   <aside class="sidebar" aria-label="Sales workspace">
     <a class="brand" href="/" aria-label="ELARA website"><img src="/assets/elara-logo.png" alt="ELARA — Sculpted Sunlit Villas"></a>
     <div class="sidebar-label">SALES WORKSPACE</div>
-    <a class="nav-link current" href="/crm" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3a4 4 0 0 1 0 8M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>Leads<span class="nav-count" id="nav-count">0</span></a>
+    <a class="nav-link current" href="/CRM/112026" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M16 3a4 4 0 0 1 0 8M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg>Leads<span class="nav-count" id="nav-count">0</span></a>
     <a class="nav-link website-link" href="/"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h6v6M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>View website</a>
     <div class="sidebar-bottom"><span class="connection-dot"></span><div>Local CRM<small>Enquiries, in one place.</small></div><span class="sidebar-monogram">E</span></div>
   </aside>
@@ -22,9 +23,10 @@
   <main id="main" class="workspace">
     <header class="workspace-header">
       <div><p class="eyebrow">ELARA / LEAD MANAGEMENT</p><h1>Good things start<br class="desktop-break"> with a conversation.</h1><p class="header-description">A little more attention. A place for every enquiry.</p></div>
-      <div class="header-actions"><button type="button" class="button button-light" id="refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 7a7 7 0 0 1 11.6-2L20 8M4 16l2.9 3A7 7 0 0 0 18.5 17"/></svg><span>Refresh</span></button><a class="button button-dark" href="/api/leads/export" download="ELARA-Leads.csv"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg>Export all leads</a></div>
+      <div class="header-actions"><button type="button" class="button button-light" id="refresh"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5M5.5 7a7 7 0 0 1 11.6-2L20 8M4 16l2.9 3A7 7 0 0 0 18.5 17"/></svg><span>Refresh</span></button><button type="button" class="button button-dark" id="export-leads"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span>Export all leads</span></button><button type="button" class="button button-light" id="logout">Sign out</button></div>
     </header>
 
+    <p class="session-message" id="session-message" role="alert" hidden></p>
     <section class="stats" aria-label="Lead status overview" id="stats"></section>
 
     <section class="leads-panel" aria-labelledby="leads-title">

@@ -4,6 +4,7 @@ import { mkdir, readFile, writeFile, rename, stat } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomBytes, randomUUID, createHash, timingSafeEqual } from 'node:crypto';
+import { createCrmAuth } from './crm-auth.mjs';
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const BODY_LIMIT = 32 * 1024;
@@ -30,6 +31,14 @@ function sendJson(res, status, payload) {
 
 function error(status, message, fields) {
   return Object.assign(new Error(message), { status, fields });
+}
+
+function isPageRequest(req, pathname) {
+  const extension = path.extname(pathname).toLowerCase();
+  return req.headers['sec-fetch-mode'] === 'navigate'
+    || req.headers['sec-fetch-dest'] === 'document'
+    || /\btext\/html\b/i.test(req.headers.accept || '')
+    || !extension || ['.html', '.htm'].includes(extension);
 }
 
 async function readJson(req) {
@@ -183,9 +192,13 @@ async function streamFile(req, res, filename, type, headers = {}) {
 }
 
 /** Creates a loopback-oriented app. The caller controls the listening port. */
-export async function createElaraServer({ publicDir = path.join(ROOT, 'public'), dataDir = path.join(ROOT, 'data'), documentsDir = path.join(ROOT, 'private') } = {}) {
+export async function createElaraServer({
+  publicDir = path.join(ROOT, 'public'), dataDir = path.join(ROOT, 'data'), documentsDir = path.join(ROOT, 'private'),
+  crmPassword = process.env.CRM_PASSWORD, authNow = Date.now,
+} = {}) {
   const dataFile = path.join(dataDir, 'leads.json');
   await mkdir(dataDir, { recursive: true });
+  const crmAuth = await createCrmAuth({ password: crmPassword, credentialFile: path.join(dataDir, 'crm-auth.json'), now: authNow });
   let database = { version: 1, leads: [], grants: [] };
   try {
     const saved = JSON.parse(await readFile(dataFile, 'utf8'));
@@ -218,6 +231,31 @@ export async function createElaraServer({ publicDir = path.join(ROOT, 'public'),
       const url = new URL(req.url, `http://${req.headers.host}`);
       const pathname = decodeURIComponent(url.pathname);
       const method = req.method;
+
+      if (pathname === '/api/crm/login' && method === 'POST') {
+        const input = await readJson(req);
+        res.setHeader('Set-Cookie', await crmAuth.login(req, input.password));
+        sendJson(res, 200, { ok: true }); return;
+      }
+      if (pathname === '/api/crm/session' && method === 'GET') {
+        sendJson(res, 200, crmAuth.sessionInfo(req)); return;
+      }
+      if (pathname === '/api/crm/logout' && method === 'POST') {
+        res.setHeader('Set-Cookie', crmAuth.logout(req));
+        sendJson(res, 200, { ok: true }); return;
+      }
+      if (pathname === '/api/leads' || pathname.startsWith('/api/leads/')) crmAuth.require(req);
+
+      if (/^\/CRM\/112026\/?$/i.test(pathname) && ['GET', 'HEAD'].includes(method)) {
+        res.setHeader('Cache-Control', 'private, no-store');
+        res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+        if (pathname !== '/CRM/112026') {
+          res.writeHead(308, { Location: '/CRM/112026' }); res.end(); return;
+        }
+        const page = crmAuth.authenticated(req) ? 'crm.html' : 'crm-login.html';
+        await streamFile(req, res, path.join(publicDir, page), TYPES['.html'], { 'Cache-Control': 'private, no-store' });
+        return;
+      }
 
       if (pathname === '/api/health' && method === 'GET') {
         sendJson(res, 200, { ok: true, app: 'ELARA', storage: 'local', statuses: STATUSES }); return;
@@ -303,20 +341,34 @@ export async function createElaraServer({ publicDir = path.join(ROOT, 'public'),
         sendJson(res, 200, { lead }); return;
       }
 
-      if (pathname.startsWith('/api/')) throw error(404, 'API endpoint not found.');
+      if (pathname === '/api' || pathname.startsWith('/api/')) throw error(404, 'API endpoint not found.');
       if (!['GET', 'HEAD'].includes(method)) throw error(405, 'Method not allowed.');
-      const target = pathname === '/' ? 'index.html' : /^\/crm\/?$/.test(pathname) ? 'crm.html' : pathname.slice(1);
-      const filename = path.resolve(publicDir, target);
-      const relative = path.relative(path.resolve(publicDir), filename);
-      if (relative.startsWith('..') || path.isAbsolute(relative) || target.includes('\\') || target.includes('\0') || target.split('/').some(part => part.startsWith('.'))) {
-        throw error(404, 'Page not found.');
+      try {
+        const target = pathname === '/' ? 'index.html' : pathname.slice(1);
+        const filename = path.resolve(publicDir, target);
+        const relative = path.relative(path.resolve(publicDir), filename);
+        // Dashboard HTML is served only through the authenticated route, even
+        // with alternate casing on Windows or percent-encoded static paths.
+        if (['crm.html', 'crm-login.html'].includes(relative.toLowerCase())) throw error(404, 'Page not found.');
+        if (relative.startsWith('..') || path.isAbsolute(relative) || target.includes('\\') || target.includes('\0') || target.split('/').some(part => part.startsWith('.'))) {
+          throw error(404, 'Page not found.');
+        }
+        const type = TYPES[path.extname(filename).toLowerCase()];
+        if (!type) throw error(404, 'Page not found.');
+        await streamFile(req, res, filename, type, { 'Cache-Control': ['.html', '.css', '.js', '.mjs'].includes(path.extname(filename)) ? 'no-store' : 'public, max-age=3600' });
+      } catch (cause) {
+        // Redirect mistyped page addresses, not API errors or failed assets.
+        // Keep the destination fixed and avoid a loop if index.html is missing.
+        if (cause.status !== 404 || pathname === '/' || !isPageRequest(req, pathname)) throw cause;
+        res.writeHead(302, { Location: '/', 'Cache-Control': 'no-store', 'Content-Length': '0' });
+        res.end();
       }
-      const type = TYPES[path.extname(filename).toLowerCase()];
-      if (!type) throw error(404, 'Page not found.');
-      await streamFile(req, res, filename, type, { 'Cache-Control': ['.html', '.css', '.js', '.mjs'].includes(path.extname(filename)) ? 'no-store' : 'public, max-age=3600' });
     } catch (cause) {
       if (res.headersSent) { res.destroy(); return; }
-      if (cause.status) sendJson(res, cause.status, { error: cause.message, ...(cause.fields ? { fields: cause.fields } : {}) });
+      if (cause.status) {
+        if (cause.retryAfter) res.setHeader('Retry-After', String(cause.retryAfter));
+        sendJson(res, cause.status, { error: cause.message, ...(cause.fields ? { fields: cause.fields } : {}) });
+      }
       else if (cause instanceof URIError) sendJson(res, 400, { error: 'Invalid request URL.' });
       else {
         console.error('ELARA request failed:', cause.message);
@@ -336,7 +388,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   });
   server.listen(port, '127.0.0.1', () => {
     console.log(`ELARA website: http://localhost:${port}`);
-    console.log(`ELARA leads CRM: http://localhost:${port}/crm`);
+    console.log(`ELARA leads CRM: http://localhost:${port}/CRM/112026 (password required)`);
     console.log('Local preview only. Leads are stored in data/leads.json.');
   });
 }

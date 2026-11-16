@@ -13,9 +13,11 @@ npm start
 Or double-click `start-elara.cmd`.
 
 - Website: http://localhost:3000
-- Leads CRM: http://localhost:3000/crm
+- Leads CRM: http://localhost:3000/CRM/112026 (password required)
 
 Keep the server terminal open. Stop with Ctrl+C. If port 3000 is occupied, use `$env:PORT=3002` then `npm start`.
+
+Unknown page addresses, including mistyped or old CRM URLs, redirect to the landing page at `/`. The correct CRM address remains password-protected. API errors and missing background assets keep their error responses.
 
 ## Enquiries and downloads
 
@@ -25,11 +27,15 @@ There was no original brochure among the supplied assets. `private/ELARA-Brochur
 
 ## Leads workspace
 
-The CRM starts empty. It offers search, status and document filters, newest/oldest sorting, refresh, CSV export, and a lead drawer with contact details, enquiry message, editable status and private notes. Statuses: New, Contacted, Qualified, Site visit, Closed, Lost. Times display in India Standard Time.
+The CRM requires a password at `/CRM/112026` before showing the dashboard or any lead data. It offers search, status and document filters, newest/oldest sorting, refresh, CSV export, and a lead drawer with contact details, enquiry message, editable status and private notes. Statuses: New, Contacted, Qualified, Site visit, Closed, Lost. Times display in India Standard Time. The public website does not link to the CRM; the old `/crm` and direct `/crm.html` routes are unavailable.
+
+Set or change the password with `npm run crm:password`, then restart the server. Password entry is hidden; only a salted scrypt hash is saved to the ignored `data/crm-auth.json` file. The actual password is never written into client code or Git. An optional `CRM_PASSWORD` environment variable overrides that local file. Without a configured password, CRM sign-in stays unavailable and all lead APIs remain locked; public enquiries and document downloads still work.
+
+Sign-in creates an opaque HttpOnly, SameSite=Strict session cookie lasting eight hours. Sessions expire on restart and are revoked by Sign out. Five failed attempts from the same address trigger a fifteen-minute sign-in limit. Lead reads, changes and CSV exports require authentication on the server; the CRM pages and responses are not cached.
 
 Leads, notes and hashed download grants persist in `data/leads.json`. Back up this file before replacing or moving the project. It contains personal enquiry information and is excluded from Git. Test data is isolated from this file.
 
-This is a local development application. It binds only to `127.0.0.1` and has no CRM login. Before a public deployment, add authenticated staff access, production storage and a reviewed privacy policy.
+This is a local development application. It binds only to `127.0.0.1` and uses a shared CRM password. Before a public deployment, configure HTTPS, individual staff access, production storage and a reviewed privacy policy.
 
 ## Files to edit
 
@@ -53,6 +59,9 @@ This is a local development application. It binds only to `127.0.0.1` and has no
 - `public/assets/villa-sunrise-cleanplate.png`: reconstructed backing used only where moving plant silhouettes reveal the background
 - `public/vendor/three.module.js`: locally served Three.js r170, with its MIT license alongside
 - `public/crm.html`, `public/crm.css`, `public/crm.js`: leads workspace
+- `public/crm-login.html`, `public/crm-login.css`, `public/crm-login.js`: password sign-in screen
+- `crm-auth.mjs`: password verification, sessions and sign-in limits
+- `scripts/set-crm-password.mjs`: local password setup without saving plaintext
 - `public/assets/`: extracted logos and optimized supplied media
 - `private/`: gated brochure and price sheet
 - `server.mjs`: local HTTP server, validation, persistence and downloads
@@ -66,7 +75,7 @@ The asset script uses Pillow, pypdf, reportlab and Poppler. These are only requi
 npm test
 ```
 
-Tests use temporary fixture data and cover enquiry validation, persistence, protected downloads, ZIP structure, CRM updates, CSV escaping, origin checks and private path protection.
+Tests use temporary fixture data and cover enquiry validation, persistence, protected downloads, ZIP structure, authenticated CRM updates, CSV escaping, origin checks, private path protection, password verification, session expiry/logout and sign-in limits.
 
 All source material in the project root is retained unchanged. No site has been published.
 
